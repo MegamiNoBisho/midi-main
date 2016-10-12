@@ -4,6 +4,7 @@
 //= Hanashi
 //===== Current Version: =====================================
 //= 3.4
+//= 3.5 [Cyan - Modification]
 //===== Compatible With: =====================================
 //= rAthena Project
 //===== Description: =========================================
@@ -17,44 +18,34 @@
 //============================================================
 
 prontera,151,181,0	script	merchant#one	72,{
+	for(.@i = 1; .@i < 6; .@i++){
+		if(.resetone == .@i){
+			callshop "store#"+.@i,0;
+			break;
+		}
+	}
+	end;	
+OnInit:
 	set .resetone,1;
-	if(gettime(4)==1)//monday
-	{
-		if(.resetone==5){
-		set .resetone, .resetone -4;	
-		}
-		else if(.resetone<5){
-		set .resetone, .resetone +1;
-		}
+OnClock0000:
+	if(gettime(4) == 2){
+			if(gettime(4) == 1)//monday
+			{
+				if(.resetone == 5){
+					set .resetone, .resetone -4;	
+				}
+				else if(.resetone < 5){
+					set .resetone, .resetone +1;
+				}
+			}
 	}
-	
-//============================================================		
-	if(.resetone==1){
-	callshop "store#1", 0;
-	end;
-	}
-	if(.resetone==2){
-	callshop "store#2", 0;
-	end;
-	}
-	if(.resetone==3){
-	callshop "store#3", 0;
-	end;
-	}
-	if(.resetone==4){
-	callshop "store#4", 0;
-	end;
-	}
-	if(.resetone==5){
-	callshop "store#5", 0;
-	end;
-	}
+end;
  }
 //============================================================
 //= list of store item shop 1
 //============================================================
 
- -	shop	store#1	-1,512:10
+-	shop	store#1	-1,512:10
 -	shop	store#2	-1,513:20
 -	shop	store#3	-1,514:30
 -	shop	store#4	-1,515:40
