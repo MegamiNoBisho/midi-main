@@ -1,0 +1,152 @@
+//===== rAthena Script ======================================= 
+//= Weekly Routine Merchant
+//===== By: ==================================================
+//= Hanashi
+//===== Current Version: =====================================
+//= 3.4
+//===== Compatible With: =====================================
+//= rAthena Project
+//===== Description: =========================================
+//= changing store items
+//= changes on desired day
+//= resets after 5 times changing store items
+//==== additional comments: ===================================
+//= if the server resets
+//= it will go back to first store item
+//= (second store if you are in a specified day) 
+//============================================================
+
+prontera,151,181,0	script	merchant#one	72,{
+	set .resetone,1;
+	if(gettime(4)==1)//monday
+	{
+		if(.resetone==5){
+		set .resetone, .resetone -4;	
+		}
+		else if(.resetone<5){
+		set .resetone, .resetone +1;
+		}
+	}
+	
+//============================================================		
+	if(.resetone==1){
+	callshop "store#1", 0;
+	end;
+	}
+	if(.resetone==2){
+	callshop "store#2", 0;
+	end;
+	}
+	if(.resetone==3){
+	callshop "store#3", 0;
+	end;
+	}
+	if(.resetone==4){
+	callshop "store#4", 0;
+	end;
+	}
+	if(.resetone==5){
+	callshop "store#5", 0;
+	end;
+	}
+ }
+//============================================================
+//= list of store item shop 1
+//============================================================
+
+ -	shop	store#1	-1,512:10
+-	shop	store#2	-1,513:20
+-	shop	store#3	-1,514:30
+-	shop	store#4	-1,515:40
+-	shop	store#5	-1,516:50
+//============================================================
+
+prontera,151,179,0	script	merchant#two	72,{
+	set .resettwo,1;
+	if(gettime(4)==4)//thursday
+	{
+		if(.resettwo==5){
+		set .resettwo, .resettwo -4;	
+		}
+		else if(.resettwo<5){
+		set .resettwo, .resettwo +1;
+		}
+	}
+	
+//============================================================		
+	if(.resettwo==1){
+	callshop "store#6", 0;
+	end;
+	}
+	if(.resettwo==2){
+	callshop "store#7", 0;
+	end;
+	}
+	if(.resettwo==3){
+	callshop "store#8", 0;
+	end;
+	}
+	if(.resettwo==4){
+	callshop "store#9", 0;
+	end;
+	}
+	if(.resettwo==5){
+	callshop "store#10", 0;
+	end;
+	}
+}
+//============================================================
+//= list of store item shop 2
+//============================================================
+
+ -	shop	store#6	-1,512:10
+-	shop	store#7	-1,513:20
+-	shop	store#8	-1,514:30
+-	shop	store#9	-1,515:40
+-	shop	store#10	-1,516:50
+//============================================================
+
+prontera,151,177,0	script	merchant#three	72,{
+	set .resetthree,1;
+	if(gettime(4)==6)//saturday
+	{
+		if(.resetthree==5){
+		set .resetthree, .resetthree -4;	
+		}
+		else if(.resetthree<5){
+		set .resetthree, .resetthree +1;
+		}
+	}
+	
+//============================================================		
+	if(.resetthree==1){
+	callshop "store#11", 0;
+	end;
+	}
+	if(.resetthree==2){
+	callshop "store#12", 0;
+	end;
+	}
+	if(.resetthree==3){
+	callshop "store#13", 0;
+	end;
+	}
+	if(.resetthree==4){
+	callshop "store#14", 0;
+	end;
+	}
+	if(.resetthree==5){
+	callshop "store#15", 0;
+	end;
+	}
+}
+//============================================================
+//= list of store item shop 3
+//============================================================
+
+ -	shop	store#11	-1,512:10
+-	shop	store#12	-1,513:20
+-	shop	store#13	-1,514:30
+-	shop	store#14	-1,515:40
+-	shop	store#15	-1,516:50
+//============================================================
