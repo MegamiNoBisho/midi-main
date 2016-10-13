@@ -28,7 +28,6 @@ prontera,151,181,0	script	merchant#one	72,{
 OnInit:
 	set .resetone,1;
 OnClock0000:
-	if(gettime(4) == 2){
 			if(gettime(4) == 1)//monday
 			{
 				if(.resetone == 5){
@@ -38,7 +37,6 @@ OnClock0000:
 					set .resetone, .resetone +1;
 				}
 			}
-	}
 end;
  }
 //============================================================
