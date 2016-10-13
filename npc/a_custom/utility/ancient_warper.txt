@@ -56,7 +56,7 @@
 								"Morroc",		// 4
 								"Payon",		// 5
 								"Prontera";	// 6
-			for(.@i=0; .@i<getarraysize(.Cities_Menu$); .@i++)
+			for(.@i = 0; .@i < getarraysize(.Cities_Menu$); .@i++)
 				.@Cities_Menu$ = .@Cities_Menu$ + .Cities_Menu$[.@i] + ":";
 			.@CCities_Menu = select(.@Cities_Menu$)-1;
 			switch(.@CCities_Menu){
@@ -84,10 +84,10 @@
 									"Sphinx",				// 10
 									"Sunken Ship",			// 11
 									"Turtle Island Dungeon";	// 12
-			for(.@i=0; .@i<getarraysize(.Dungeons_Menu$); .@i++)
+			for(.@i=0; .@i < getarraysize(.Dungeons_Menu$); .@i++)
 				.@Dungeon_Menu$ = .@Dungeon_Menu$ + .Dungeons_Menu$[.@i] + ":";
 			.@DDungeon_Menu = select(.@Dungeon_Menu$)-1;
-			switch(.@Dungeon_Menu$){
+			switch(.@DDungeon_Menu){ 
 				case 0:	/*Ant Hell*/	KnownMaps(#Known_AntHell,@KnownMapsError$);	ZenyCheck(.WarpPrice);	warp "moc_fild04",209,328;	break;
 				case 1:	/*Byalan Island Dungeon*/	KnownMaps(#Known_Byalan,@KnownMapsError$);	ZenyCheck(.WarpPrice);	warp "izlu2dun",107,50;	break;
 				case 2:	/*Clock Tower*/	KnownMaps(#Known_ClockTower,@KnownMapsError$);	ZenyCheck(.WarpPrice);	warp "aldebaran",139,131;	break;
