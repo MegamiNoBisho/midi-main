@@ -2854,7 +2854,7 @@ int mob_dead(struct mob_data *md, struct block_list *src, int type)
 				int index = rnd() % MAX_BOSSBGM;
 				bgm = battle_config.boss_die_bgm[index];
 			} while (bgm == NULL);
-			clif_playBGM(sd, bgm->name);
+			clif_playBGM(mvp_sd, bgm->name);
 		}
 	}
 

@@ -4607,7 +4607,7 @@ void clif_getareachar_unit(struct map_session_data* sd,struct block_list *bl)
 					int index = rnd() % MAX_BOSSBGM;
 					bgm = battle_config.boss_approach_bgm[index];
 				} while (bgm == NULL);
-				clif_playBGM(mvp_sd, bgm->name);
+				clif_playBGM(sd, bgm->name);
 			}
 		}
 		break;
