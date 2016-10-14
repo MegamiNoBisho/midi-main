@@ -39,7 +39,7 @@
 
 // Black Cat Ears
 //============================================================
-payon,115,131,3	script	Neko Neko#1	725,{
+payon_mem,41,150,3	script	Neko Neko#1	725,{
 	disable_items;
 	if (checkweight(1201,1) == 0) {
 		mes "- Wait a minute! -";
