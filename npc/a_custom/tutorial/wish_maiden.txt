@@ -108,11 +108,23 @@ didymos1,79,328,5	script	Guardian#aiora_1	403,{
 	}
 	next;
 	mes "[ Guardian ]";
+	mes "What do you wish to do now?";
+	switch(select("Play Tutorial - ^ff0000Freebies^000000:Direct Access")){
+		case 1: @forward = 0; break;
+		case 2: @forward = 1; break;
+	}
+	next;
+	mes "[ Guardian ]";
 	mes "Now go forward to your ^ff0000Destiny^000000";
 	mes "May the Light of the All Father shine upon you always.";
 	close2;
-	savepoint "didymos1",83,124;
-	warp "didymos1",83,124;
+	if(@forward == 0){
+		savepoint "didymos1",83,124;
+		warp "didymos1",83,124;
+		end;
+	}
+	savepoint "payon_mem",69,100;
+	warp "payon_mem",69,100;
 	end;
 }
 
