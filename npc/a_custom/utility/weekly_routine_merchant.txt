@@ -23,7 +23,7 @@ prontera,151,181,0	script	merchant#one	72,{
 		callshop "store#"+.resetone,1;
 end;
 OnClock0000:
-	if(gettime(5) == 6)//saturday
+	if(gettime(4) == 6)//saturday
 		.resetone += 1;
 	if(.resetone == 6)
 		.resetone = 1;

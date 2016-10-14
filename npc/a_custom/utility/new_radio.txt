@@ -1,21 +1,17 @@
 //////////////////////////////////////////////////////////////////
-//								//
-//								//				
-//								//
-//    	   Midi City Ragnarok Online - Musical Radio DJ	  	//
-//								//
-//								//
-//								//
+//																//
+//																//				
+//																//
+//    	   Midi City Ragnarok Online - Musical Radio DJ	  		//
+//																//
+//																//
+//																//
 //////////////////////////////////////////////////////////////////
 
 -	script	Radio DJ#vip		-1,{
-
-
 OnRadio:
-
 	deletearray @title$;
 	deletearray @number;
-
 	if(.delay > gettimetick(2) ){
 		mes "[ ^9d3ad3 Radio DJ ^000000 ]";
 		mes "I'm sorry, but I can only play a song every 3 minutes.";
@@ -23,40 +19,33 @@ OnRadio:
 		close;
 		end;
 	}
-
-	
 	mes "anime_"+.@rand;
 	mes "[ ^9d3ad3 Radio DJ ^000000 ]";
 	mes "Which Playlist would you like to browse?";
 	switch(select("Show by Rock:Aldnoah Zero:Fetty Wap")){
-	
 		case 1: callsub OnPlaylistSelect,1; break;
 		case 2: callsub OnPlaylistSelect,2; break;
 		case 3:	callsub OnPlaylistSelect,3; break;
-	
 	}
-	
 	OnBackToMenu:
 	next;
 	mes "[ ^9d3ad3 Radio DJ ^000000 ]";
 	mes "I can play you a number of songs.";
 	mes "What would you like to do?";
-	
 	switch(select("Play a song:View the list")){
-	
 		case 1:	
 			next;
 			mes "[ ^9d3ad3 Radio DJ ^000000 ]";
 			mes "What number did you want to play?";
 			input .@bgm;
-			if(.@bgm > @genre_count+100 || .@bgm < @genre_count){
+			if(.@bgm > @genre_count || .@bgm < @genre_count){
 				next;
 				mes "[ Radio DJ ]";
 				mes "That is not possible to play right now.";
 				close;
 				end;
 			}
-			for(set .@i,@genre_count;.@i < getarraysize(@title$);.@i++){
+			for(set .@i,@genre_count + 100;.@i < getarraysize(@title$);.@i++){
 				if(.@bgm == .number[.@i])
 					set .@bgm_check, .@bgm_check+1;
 			}
@@ -80,24 +69,23 @@ OnRadio:
 					sleep2 1000;
 					playBGM @number$[.@bgm];
 					end;
-				
 				case 2:
 					mes "[ ^9d3ad3 Radio DJ ^000000 ]";
-					mes "To play it for everyone, I'll need ^FF000010 MIDI Coins^000000";
+					mes "To play it for everyone, I'll need ^FF00001000 Cash Points^000000";
 					mes "Do you still want to proceed?";
 					menu "Yes",-;
-					if(countitem(30000) < 10){
+					if(#CASHPOINTS < 1000){
 						next;
 						mes "[ ^9d3ad3 Radio DJ ^000000 ]";
-						mes "You don't have enough MIDI Coins to pay for this service.";
+						mes "You don't have enough CASH POINTS to pay for this service.";
 						close;
 						end;
 					}
 					mes "[ ^9d3ad3 Radio DJ ^000000 ]";
 					mes "Splendid choice!";
 					mes "I will play it shortly.";
-					delitem 30000,10; //10 Midi Coins
-					message strcharinfo(0),"You paid 10 MIDI Coins";
+					#CASHPOINTS -= 1000;
+					message strcharinfo(0),"You paid 1000 Cash Points";
 					close2;
 					announce strcharinfo(0)+" has chosen to play [ "+@title$[.@bgm]+" ] for everyone!",1;
 					sleep2 2000;
@@ -105,58 +93,59 @@ OnRadio:
 					set .delay, gettimetick(2) + 300;
 					end;
 			}
-			
 		case 2:
 			next;
 			mes "[ ^9d3ad3 Radio DJ ^000000 ]";
 			mes "I can play the following: ";
 			mes "^FF0000---------^000000^00FF00---------^000000^0000FF---------^000000";
 			mes "[^FF0000Number^000000] - [^0000FFTitle^000000]";
-
 			for(set .@i,@genre_count; .@i < getarraysize(@title$); .@i++){
 				mes "^FF0000"+@number$[.@i]+"^000000 - ^0000FF"+@title$[.@i]+"^000000";
 			}
 			switch(select("Play a song:Back to Playlists")){
-			
 				case 1:	next; goto OnBackToMenu;
 				case 2: next; goto OnRadio;
-			
 			}
 			end;
 	}
 end;
-
 OnPlaylistSelect:
-
 	switch(getarg(0)){
 		case 1:
-				setarray @title$[300],"Seishun wa Non-Stop!"
-									 ,"Ryuusei Dream Line"
-									 ,"Crimson Quartet"
-									 ,"Falling Rose"
-									 ,"Yes! Idol Sengen"
-									 ,"Meikyuu DESTINY"
-									 ,"Have a nice MUSIC!";
-				setarray @number$[300],"300","301","302","303","304","305","306","307";
-				setarray @number[300],"300","301","302","303","304","305","306","307";
-				set @genre_count,300;
+				setarray @title$[500],"No Title"
+									 ,"No Title"
+									 ,"No Title"
+									 ,"Symphonic Knights"
+									 ,"Akki Shuurai"
+									 ,"Owari Naki Wrath"
+									 ,"No Title"
+									 ,"No Title"
+									 ,"No Title";
+				setarray @number$[500],"500","501","502","503","504","505","506","507","508";
+				setarray @number[500],500,501,502,503,504,505,506,507,508;
+				set @genre_count,500;
 				return;
 		case 2:
-				setarray @title$[700],"Example!","Nanchatte Friends","Plasmagica Biyori";
-				setarray @number$[700],"500","501","502";
-				setarray @number[700],"500","501","502";
-				set @genre_count,700;
+				setarray @title$[520],"Jounetsu ni Somaru Oretachi"
+									 ,"Anata ni Sasageru Melody"
+									 ,"Crisis of the Scene"
+									 ,"Mouichido Dake Session wo"
+									 ,"Yasashii Kimochi de"
+									 ,"Itsuka Kaeru Hi ga Kite mo";
+				setarray @number$[520],"520","521","522","523","524","525";
+				setarray @number[520],520,521,522,523,524,525;
+				set @genre_count,520;
 				return;
 		case 3:
-				setarray @title$[600],"In the Zone"; //Title of the Song
-				setarray @number$[600],"600"; //Number of the song [ BGM Folder ]
-				setarray @number[600],600; //Same as above, need for checks
-				set @genre_count,600; //Do not touch
+				setarray @title$[530],"We are the ROCK"
+									 ,"The Springtime!"
+									 ,"To be continued"; //Title of the Song
+				setarray @number$[530],"530","531","532"; //Number of the song [ BGM Folder ]
+				setarray @number[530],530,531,532; //Same as above, need for checks
+				set @genre_count,530; //Do not touch
 				return;
 	}
-
 end;
-
 OnInit:
 	bindatcmd "radio",strnpcinfo(3)+"::OnRadio";
 	end;
