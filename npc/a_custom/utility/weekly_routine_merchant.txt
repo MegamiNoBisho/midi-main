@@ -16,27 +16,17 @@
 //= it will go back to first store item
 //= (second store if you are in a specified day) 
 //============================================================
-
 prontera,151,181,0	script	merchant#one	72,{
-	for(.@i = 1; .@i < 6; .@i++){
-		if(.resetone == .@i){
-			callshop "store#"+.@i,0;
-			break;
-		}
-	}
-	end;	
-OnInit:
-	set .resetone,1;
+	if(!.resetone)
+		callshop "store#1",1;
+	else
+		callshop "store#"+.resetone,1;
+end;
 OnClock0000:
-			if(gettime(4) == 1)//monday
-			{
-				if(.resetone == 5){
-					set .resetone, .resetone -4;	
-				}
-				else if(.resetone < 5){
-					set .resetone, .resetone +1;
-				}
-			}
+	if(gettime(5) == 6)//saturday
+		.resetone += 1;
+	if(.resetone == 6)
+		.resetone = 1;
 end;
  }
 //============================================================
