@@ -1467,7 +1467,7 @@ L_Done:
 //Pretend Murdered quest-------------------------------
 pa2_in01,103,107,4	script	Granny#oldpay	78,{
 	mes "[Granny]";
-	if(countitem(1049) == 4) goto L_Get;
+	if(countitem(1049) <= 4) goto L_Get;
 
 	mes "Oh deary me.  What to do... what to do........  You see I want to nitt some special clothes for my family but I don't have the right cloth to do so.";
 	next;
