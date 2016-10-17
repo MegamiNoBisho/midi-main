@@ -12,7 +12,7 @@
 //= doesnt break weapons or armor
 //= added manual and automatic transmission
 //============================================================
-pa2_in01,85,19,8	script	Wayland	63,{
+adventure,167,239,8	script	Wayland	63,{
 callfunc "saferefine","Wayland",0;
 	end;
 }
@@ -98,7 +98,7 @@ function	script	saferefine	{
 //=============================================================	
 		mes "["+ .@npc_name$ +"]";
 		mes "To refine this I need";
-		mes "one ^003366"+getitemname(.@material)+"^000000 ,^BB00CC"+getitemname(7620)+"^000000 and ^BB00CC"+getitemname(7619)+"^000000";
+		mes "one ^BB00CC"+getitemname(.@material)+"^000000 ,^BB00CC"+getitemname(7620)+"^000000 and ^BB00CC"+getitemname(7619)+"^000000";
 		mes "Do you really wish to continue?";
 		next;	
 		if(select("Yes:No") == 2){
