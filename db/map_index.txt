@@ -1061,3 +1061,10 @@ night_city
 ice_palace
 miku_stage
 knossos
+
+//nightmare mode map
+c_tower4_n
+gl_prison_n
+moc_pryd04_n
+pay_dun04_n
+prt_sewb4_n
