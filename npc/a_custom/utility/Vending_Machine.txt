@@ -13,7 +13,7 @@
 //= 10 product
 //============================================================
 
-prontera,151,175,0	script	Vending Machine	562,{
+adventure,172,252,0	script	Vending Machine	562,{
 callfunc "vendingmachine","Vending Machine",0;
 	end;
 }
@@ -23,11 +23,11 @@ disable_items;
 .@npc_name$ = getarg(0);
 mes "["+ .@npc_name$ +"]";
 mes	"item list";
-mes "<ITEM>Apple<INFO>512</INFO></ITEM>	10zeny";
-mes "<ITEM>Banana<INFO>513</INFO></ITEM>	20zeny";
-mes "<ITEM>Grape<INFO>514</INFO></ITEM>	30zeny";
-mes "<ITEM>Carrot<INFO>515</INFO></ITEM>	40zeny";
-mes "<ITEM>Potato<INFO>516</INFO></ITEM>	50zeny";
+mes "Apple	10zeny";
+mes "Banana	20zeny";
+mes "Grape	30zeny";
+mes "Carrot	40zeny";
+mes "Potato	50zeny";
 next;
 product:
 mes "["+ .@npc_name$ +"]";
