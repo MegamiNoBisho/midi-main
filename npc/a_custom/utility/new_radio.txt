@@ -15,6 +15,7 @@ OnRadio:
 	switch(select(.playlist$)){
 		case 1: callsub OnPlaylistSelect,1; break;
 		case 2: callsub OnPlaylistSelect,2; break;
+		case 3: callsub OnPlaylistSelect,3; break;
 	}
 	next;
 	mes "[ ^9d3ad3 Radio DJ ^000000 ]";
