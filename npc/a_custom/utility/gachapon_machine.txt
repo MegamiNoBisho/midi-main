@@ -1,4 +1,5 @@
 adventure,176,236,5	script	Gachapon Machine#main	562,{
+
 	mes "[ Gachapon Machine ]";
 	mes "Reward list for the month of ^ff0000"+.month$[gettime(6)]+"^000000";
 	for(.@i = 0; .@i < .headgear_reward; .@i++){
@@ -7,7 +8,8 @@ adventure,176,236,5	script	Gachapon Machine#main	562,{
 	next;
 	switch(select("Pull Once:Pull ten times:Pull twenty times")){
 		case 1:
-			set Zeny,Zeny-.@one_pull_price;
+			if(#CASHPOINTS < .one_pull_price){ dispbottom "Not enough Cash Points. You require "+.one_pull_price; end; }
+			#CASHPOINTS -= .one_pull_price;
 			.@rand = rand(1,100);
 			if(.@rand <= .one_pull){
 				.@rand = rand(0,.headgear_reward - 1);
@@ -20,9 +22,9 @@ adventure,176,236,5	script	Gachapon Machine#main	562,{
 			getitem .specialreward[.@rand],1;
 			dispbottom "Too bad, please try again next time~";
 			end;
-			break;
 		case 2:
-			set Zeny,Zeny-.@ten_pull_price;
+			if(#CASHPOINTS < .ten_pull_price){ dispbottom "Not enough Cash Points. You require "+.ten_pull_price; end; }
+			#CASHPOINTS -= .ten_pull_price;
 			.@i = 0;
 			while(.@i < .ten_pull){
 				.@got_reward = 0;
@@ -41,7 +43,8 @@ adventure,176,236,5	script	Gachapon Machine#main	562,{
 			}
 			break;
 		case 3:
-			set Zeny,Zeny-.@twenty_pull_price;
+			if(#CASHPOINTS < .twenty_pull_price){ dispbottom "Not enough Cash Points. You require "+.twenty_pull_price; end; }
+			#CASHPOINTS -= .twenty_pull_price;
 			.@i = 0;
 			while(.@i < .twenty_pull){
 				.@got_reward = 0;
@@ -67,9 +70,9 @@ OnInit:
 	.ten_pull = 10;
 	.twenty_pull = 20;
 	//price of pulls
-	.@one_pull_price,1000;
-	.@ten_pull_price,9500;
-	.@twenty_pull_price,17500;
+	.one_pull_price = 1000;
+	.ten_pull_price = 9500;
+	.twenty_pull_price = 17500;
 	//reward depending on month
 	switch(gettime(6)){
 		case 1:
