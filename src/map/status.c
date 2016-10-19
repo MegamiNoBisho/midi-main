@@ -3420,6 +3420,8 @@ int status_calc_pc_(struct map_session_data* sd, enum e_status_calc_opt opt)
 	memset(sd->param_bonus, 0, sizeof(sd->param_bonus));
 
 	base_status->def += (refinedef+50)/100;
+	// + 0.4 MDEF per refine:
+	base_status->mdef += (refinedef+50)/175; // Scylla
 
 	// Parse Cards
 	for (i = 0; i < EQI_MAX; i++) {
@@ -6180,7 +6182,7 @@ static signed short status_calc_def2(struct block_list *bl, struct status_change
 		def2 -= def2 * sc->data[SC_CONCENTRATION]->val4/100;
 #endif
 	if(sc->data[SC_POISON])
-		def2 -= def2 * 25/100;
+		def2 -= def2 * 75/100;
 	if(sc->data[SC_DPOISON])
 		def2 -= def2 * 25/100;
 	if(sc->data[SC_SKE])
@@ -7630,8 +7632,9 @@ int status_get_sc_def(struct block_list *src, struct block_list *bl, enum sc_typ
 	switch (type) {
 		case SC_POISON:
 		case SC_DPOISON:
-			sc_def = status->vit*100;
-			sc_def2 = status->luk*10 + status_get_lv(bl)*10 - status_get_lv(src)*10;
+			// Removed VIT / LUK resistance thus making poison 100% even with VIT / LUK
+			//sc_def = status->vit*100; // Commented by Scylla
+			//sc_def2 = status->luk*10 + status_get_lv(bl)*10 - status_get_lv(src)*10; // Commented by Scylla
 			if (sd) {
 				// For players: 60000 - 450*vit - 100*luk
 				tick_def = status->vit*75;
