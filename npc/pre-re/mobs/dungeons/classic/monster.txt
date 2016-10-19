@@ -666,10 +666,12 @@ moc_pryd03.gat,0,0,0,0	monster	Skeleton Archer	1016,15,0,0,0
 moc_pryd03.gat,0,0,0,0	monster	Skeleton Soldier	1028,5,0,0,0
 moc_pryd03.gat,0,0,0,0	monster	Mummy	1041,45,0,0,0
 moc_pryd03.gat,0,0,0,0	monster	Drainliar	1111,15,0,0,0
-moc_pryd03.gat,0,0,0,0	monster	Mimic	1191,2,600000,300000,1
+moc_pryd03.gat,0,0,0,0	monster	Mimic	1191,10,0,0,1
+moc_pryd03.gat,0,0,0,0	monster	Matyr	1146,15,0,0,1
+moc_pryd03.gat,0,0,0,0	monster	Verit	1032,15,0,0,1
 
 //ピラミッドダンジョン ４Ｆ(moc_pryd04)
-moc_pryd04.gat,0,0,0,0	monster	Isis	1029,30,150000,75000,0
+moc_pryd04.gat,0,0,0,0	monster	Isis	1029,40,150000,75000,0
 moc_pryd04.gat,0,0,0,0	monster	Ghoul	1036,20,0,0,0
 
 moc_pryd04.gat,0,0,0,0	monster	Mummy	1041,45,0,0,0
@@ -1061,6 +1063,8 @@ prt_sewb4.gat,0,0,0,0	monster	Thief Bug Egg	1048,40,0,0,0
 prt_sewb4.gat,0,0,0,0	monster	Thief Bug Larva	1051,60,0,0,0
 prt_sewb4.gat,0,0,0,0	monster	Thief Bug Female	1053,60,0,0,0
 prt_sewb4.gat,0,0,0,0	monster	Thief Bug Male	1054,60,0,0,0
+prt_sewb4.gat,0,0,0,0	monster	Cramp	1209,15,0,0,0
+prt_sewb4.gat,0,0,0,0	monster	Drainliar	1111,30,0,0,0
 
 
 //PvP : 南北戦争(pvp_n_8-1)

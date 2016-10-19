@@ -1,0 +1,124 @@
+prontera,151,173,5	script	Gachapon Machine#main	123,{
+	mes "[ Gachapon Machine ]";
+	mes "Reward list for the month of ^ff0000"+.month$[gettime(6)]+"^000000";
+	for(.@i = 0; .@i < .headgear_reward; .@i++){
+		mes getitemname(.headgearlist[.@i]);
+	}
+	next;
+	switch(select("Pull Once:Pull ten times:Pull twenty times")){
+		case 1:
+			.@rand = rand(1,100);
+			if(.@rand <= .one_pull){
+				.@rand = rand(0,.headgear_reward - 1);
+				getitem .headgearlist[.@rand],1;
+				dispbottom "Congratulations, you won!";
+				announce strcharinfo(0)+" pulled once and won "+getitemname(.headgearlist[.@rand])+"!",0;
+				end;
+			}
+			.@rand = rand(0,.special_reward - 1);
+			getitem .specialreward[.@rand],1;
+			dispbottom "Too bad, please try again next time~";
+			end;
+		case 2:
+			.@i = 0;
+			while(.@i < .ten_pull){
+				.@got_reward = 0;
+				.@rand = rand(1,100);
+					if(.@rand <= .ten_pull){
+						.@rand = rand(0,.headgear_reward - 1);
+						getitem .headgearlist[.@rand],1;
+						announce strcharinfo(0)+" pulled once and won "+getitemname(.headgearlist[.@rand])+"!",0;
+						.@got_reward = 1;
+					}
+				if(.@got_reward != 1){
+					.@rand = rand(0,.special_reward - 1);
+					getitem .specialreward[.@rand],1;
+				}
+			.@i++;
+			}
+			break;
+		case 3:
+			.@i = 0;
+			while(.@i < .twenty_pull){
+				.@got_reward = 0;
+				.@rand = rand(1,100);
+					if(.@rand <= .twenty_pull){
+						.@rand = rand(0,.headgear_reward - 1);
+						getitem .headgearlist[.@rand],1;
+						announce strcharinfo(0)+" pulled once and won "+getitemname(.headgearlist[.@rand])+"!",0;
+						.@got_reward = 1;
+					}
+				if(.@got_reward != 1){
+					.@rand = rand(0,.special_reward - 1);
+					getitem .specialreward[.@rand],1;
+				}
+			.@i++;
+			}
+			break;
+	}
+end;
+OnInit:
+	//number of pulls + chance %
+	.one_pull = 5;
+	.ten_pull = 10;
+	.twenty_pull = 20;
+	//price of pulls
+	.one_pull_price = 1000;
+	.ten_pull_price = 9500;
+	.twenty_pull_price = 17500;
+	//reward depending on month
+	switch(gettime(6)){
+		case 1:
+			setarray .headgearlist,502,503,504,505;
+			setarray .specialreward,510,511,512,513;
+			break;
+		case 2:
+			setarray .headgearlist,502,503,504,505;
+			setarray .specialreward,510,511,512,513;
+			break;
+		case 3:
+			setarray .headgearlist,502,503,504,505;
+			setarray .specialreward,510,511,512,513;
+			break;
+		case 4:
+			setarray .headgearlist,502,503,504,505;
+			setarray .specialreward,510,511,512,513;
+			break;
+		case 5:
+			setarray .headgearlist,502,503,504,505;
+			setarray .specialreward,510,511,512,513;
+			break;
+		case 6:
+			setarray .headgearlist,502,503,504,505;
+			setarray .specialreward,510,511,512,513;
+			break;
+		case 7:
+			setarray .headgearlist,502,503,504,505;
+			setarray .specialreward,510,511,512,513;
+			break;
+		case 8:
+			setarray .headgearlist,502,503,504,505;
+			setarray .specialreward,510,511,512,513;
+			break;
+		case 9:
+			setarray .headgearlist,502,503,504,505;
+			setarray .specialreward,510,511,512,513;
+			break;
+		case 10:
+			setarray .headgearlist,502,503,504,505;
+			setarray .specialreward,510,511,512,513;
+			break;
+		case 11:
+			setarray .headgearlist,502,503,504,505;
+			setarray .specialreward,510,511,512,513;
+			break;
+		case 12:
+			setarray .headgearlist,502,503,504,505;
+			setarray .specialreward,510,511,512,513;
+			break;
+	}
+		.headgear_reward = getarraysize(.headgearlist);
+		.special_reward = getarraysize(.specialreward);
+		setarray .month$[1],"January","February","March","April","May","June","July","August","September","October","November","December";
+	end;
+}

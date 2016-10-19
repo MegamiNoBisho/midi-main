@@ -12,18 +12,17 @@ OnRadio:
 	}
 	mes "[ ^9d3ad3 Radio DJ ^000000 ]";
 	mes "Which Playlist would you like to browse?";
-	switch(select("English:Japanese")){
+	switch(select(.playlist$)){
 		case 1: callsub OnPlaylistSelect,1; break;
 		case 2: callsub OnPlaylistSelect,2; break;
-		case 3:	callsub OnPlaylistSelect,3; break;
 	}
-	OnBackToMenu:
 	next;
 	mes "[ ^9d3ad3 Radio DJ ^000000 ]";
 	mes "I can play you a number of songs.";
 	mes "What would you like to do?";
 	switch(select("Play a song:View the list")){
 		case 1:	
+			OnBackToMenu:
 			next;
 			mes "[ ^9d3ad3 Radio DJ ^000000 ]";
 			mes "What number did you want to play?";
@@ -108,9 +107,16 @@ OnPlaylistSelect:
 									 ,"CANDY CANDY"
 									 ,"Howl be Quiet"
 									 ,"Seven Deadly Sins"
-									 ,"Higher"; //Title of the Song
-				setarray @number$[700],"700","701","702","703","704","705","706","707"; //Number of the song [ BGM Folder ]
-				setarray @number[700],700,701,702,703,704,705,706,707; //Same as above, need for checks
+									 ,"Higher"
+									 ,"Breathless"
+									 ,"No Differences"
+									 ,"Karakuri Pierrot"
+									 ,"Staple Stable"
+									 ,"Renai Circulation"
+									 ,"Brave Shine"
+									 ,"Kimi no Shiranai Monogatari"; //Title of the Song
+				setarray @number$[700],"700","701","702","703","704","705","706","707","708","709","710","711","712","713","714"; //Number of the song [ BGM Folder ]
+				setarray @number[700],700,701,702,703,704,705,706,707,708,709,710,711,712,713,714; //Same as above, need for checks
 				set @genre_count,700; //Do not touch
 				return;
 		case 2:
@@ -119,19 +125,32 @@ OnPlaylistSelect:
 									 ,"Impossible"
 									 ,"7 Years"
 									 ,"Never forget you"
-									 ,"Sad Song"; //Title of the Song
-				setarray @number$[800],"800","801","802","803","804","805"; //Number of the song [ BGM Folder ]
-				setarray @number[800],800,801,802,803,804,805; //Same as above, need for checks
+									 ,"Sad Song"
+									 ,"Wolven Storm"
+									 ,"Emperor's New Clothes"
+									 ,"Secret Love Song"
+									 ,"Latch"
+									 ,"Sleeping with Sirens"; //Title of the Song
+				setarray @number$[800],"800","801","802","803","804","805","806","807","808","809","810"; //Number of the song [ BGM Folder ]
+				setarray @number[800],800,801,802,803,804,805,806,807,808,809,810; //Same as above, need for checks
 				set @genre_count,800; //Do not touch
+				return;
 		case 3:
-				setarray @title$[600],"In the Zone"; //Title of the Song
-				setarray @number$[600],"600"; //Number of the song [ BGM Folder ]
-				setarray @number[600],600; //Same as above, need for checks
+				setarray @title$[600],"Buko"
+									 ,"Hanggang Tingin"
+									 ,"Magkabilang Mundo"; //Title of the Song
+				setarray @number$[600],"600","601","602"; //Number of the song [ BGM Folder ]
+				setarray @number[600],600,601,602; //Same as above, need for checks
 				set @genre_count,600; //Do not touch
 				return;
+		default:
+				dispbottom getarg(0);
+				dispbottom "Something went wrong.";
+				end;
 	}
 end;
 OnInit:
 	bindatcmd "radio",strnpcinfo(3)+"::OnRadio";
+	setarray .playlist$,"Japanese:Engish:Filipino";
 	end;
 }

@@ -81,7 +81,7 @@ OnHuntList:
 		}
 	}
 	switch(.@q){//	callfuncF_HuntGen(<Arc Variable>,<Arc Name>,<Quest Ids>,<Mob Names>,<Mob Qnt>,<Zeny>,<Base Exp>,<Job Exp>,<Rewards Array>);
-		case 1:	callfunc("F_HuntGen","payon_cave1","the first floor of Payon Dungeon","85000|85001|85002|85003","Zombie|Spore|Familiar|Poporing","20|20|20|20",2000,25000,18000,"7539|1");
+		case 1:	callfunc("F_HuntGen","payon_cave1","the first floor of Payon Dungeon","85000|85001|85002|85003","Zombie|Spore|Familiar|Snake","20|20|20|20",2000,25000,18000,"7539|1");
 		case 2:	callfunc("F_HuntGen","payon_cave2","the second floor of Payon Dungeon","85004|85005|85006","Smokie|Eggrya|Magnolia","30|10|10",5000,115000,65000,"7539|1");
 		case 3:	callfunc("F_HuntGen","payon_cave3","the third floor of Payon Dungeon","85007|85008|85009|85010","Munak|Bongun|Magnolia|Hydra","30|50|15|15",5000,200000,17000000,"7539|1");
 		case 4:	callfunc("F_HuntGen","payon_cave4","the forth floor of Payon Dungeon","85011|85012|85013","Sohee|Soldier Skeleton|Greatest General","50|20|1",5000,350000,175000,"7539|1");

@@ -5,6 +5,14 @@ payon_mem,103,103,5	script	Beta Rewards	10179,{
 		mes "You need to be at least level 70 to claim these rewards.";
 		close;
 	}
+	
+	if(gettimetick(2) - #lastTimeTalked > (60 * 60 * 24)) {
+	
+	#lastTimeTalked = gettimetick(2);
+	#CASHPOINTS += 2000;
+	dispbottom "You received 2,000 Cash Points. Return again tomorrow";
+	
+	}
 
 	if(!#beta_reward){
 		.@i = rand(.gear_count);
