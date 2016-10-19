@@ -1103,9 +1103,18 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 				if (sc) {
 					struct status_change_entry *sce;
 					// Enchant Poison gives a chance to poison attacked enemies
-					if((sce=sc->data[SC_ENCPOISON])) //Don't use sc_start since chance comes in 1/10000 rate.
+					if((sce=sc->data[SC_ENCPOISON])){ //Don't use sc_start since chance comes in 1/10000 rate.
 						status_change_start(src,bl,SC_POISON,sce->val2, sce->val1,src->id,0,0,
 							skill_get_time2(AS_ENCHANTPOISON,sce->val1),SCSTART_NONE);
+						case AS_ENCHANTPOISON:
+							{
+							int heal;
+							heal = (sstatus->max_hp * 1/100)*skill_lv;
+							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
+							status_heal(src, heal, 0, 0);
+							}
+							break;
+													}
 					// Enchant Deadly Poison gives a chance to deadly poison attacked enemies
 					if((sce=sc->data[SC_EDP]))
 						sc_start4(src,bl,SC_DPOISON,sce->val2, sce->val1,src->id,0,0,
@@ -1138,7 +1147,12 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 		break;
 
 	case AS_SONICBLOW:
+		{
 		sc_start(src,bl,SC_STUN,(2*skill_lv+10),skill_lv,skill_get_time2(skill_id,skill_lv));
+		int drain;
+		drain = (tstatus->max_sp* 1/200)*skill_lv;
+		status_heal(bl, 0, -drain, 0);
+		}
 		break;
 
 	case WZ_FIREPILLAR:
