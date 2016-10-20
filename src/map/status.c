@@ -3592,6 +3592,11 @@ int status_calc_pc_(struct map_session_data* sd, enum e_status_calc_opt opt)
 		base_status->int_ += skill;
 	if (pc_checkskill(sd, SU_POWEROFLAND) > 0)
 		base_status->int_ += 20;
+	// Scylla - Passive adds
+	if((skill = pc_checkskill(sd,BS_MAXIMIZE))>0) // Maximize Power +1 STR * Skill LV
+		base_status->str += skill;
+	if((skill = pc_checkskill(sd,BS_WEAPONPERFECT))>0) // Weapon Perfection +1 DEX * Skill LV
+		base_status->dex += skill;
 
 	// Bonuses from cards and equipment as well as base stat, remember to avoid overflows.
 	i = base_status->str + sd->status.str + sd->param_bonus[0] + sd->param_equip[0];
@@ -6411,6 +6416,9 @@ static unsigned short status_calc_speed(struct block_list *bl, struct status_cha
 				val = max( val, sc->data[SC_B_TRAP]->val3 );
 			if (sc->data[SC_CATNIPPOWDER])
 				val = max(val, sc->data[SC_CATNIPPOWDER]->val3);
+			// Scylla
+			if(pc_checkskill(sd,BS_ADRENALINE)>0) // Adrenaline Rush Movement Speed 3 * Skill LV ( Passive )
+				val = max (val, 3 * pc_checkskill(sd,BS_ADRENALINE));
 
 			if( sd && sd->bonus.speed_rate + sd->bonus.speed_add_rate > 0 ) // Permanent item-based speedup
 				val = max( val, sd->bonus.speed_rate + sd->bonus.speed_add_rate );
