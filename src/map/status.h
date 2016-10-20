@@ -2144,6 +2144,10 @@ struct status_change {
 	unsigned char bs_counter; // Blood Sucker counter
 	struct status_change_entry *data[SC_MAX];
 };
+// Refine bonus [Cydh]
+static struct s_refine_bonus {
+	struct script_code *script;
+} refine_bonus[REFINE_TYPE_MAX][MAX_REFINE];
 
 // for looking up associated data
 sc_type status_skill2sc(int skill);
