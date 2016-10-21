@@ -509,8 +509,8 @@ ordeal_3-2	mapflag	nomemo
 pvp_c_room	mapflag	nomemo
 quiz_00	mapflag	nomemo
 quiz_01	mapflag	nomemo
-sec_in01	mapflag	nomemo
-sec_in02	mapflag	nomemo
+//sec_in01	mapflag	nomemo
+//sec_in02	mapflag	nomemo
 //hunter_1-1	mapflag	nomemo
 //hunter_2-1	mapflag	nomemo
 //hunter_3-1	mapflag	nomemo
