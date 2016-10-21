@@ -15,7 +15,7 @@
 // 1.1 English translation
 // 1.2 Stricted the conditions a bit
 //============================================================
-
+/*
 sec_pri,36,58,1	script	Chief Warder	105,{ 
 	mes "[Saddeus]";
 	emotion e_what;
@@ -168,9 +168,9 @@ L_GET_Q:
 	close;
 }
 
-
-sec_in02	mapflag	nomemo
-sec_in02	mapflag	nosave	SavePoint
+*/
+//sec_in02	mapflag	nomemo
+//sec_in02	mapflag	nosave	SavePoint
 sec_in02	mapflag	noteleport
 sec_in02	mapflag	nobranch
 sec_in02	mapflag	nowarp
@@ -181,9 +181,10 @@ sec_in02	mapflag	noskill
 //sec_in02	mapflag	pvp_noparty
 //sec_in02	mapflag	gvg
 sec_in02	mapflag	pvp_nightmaredrop	random,all,300
-
+/*
 sec_in02,138,55,100,100	monster	Toadstool	1182,30,10000,10000,1
 sec_in02,138,55,100,100	monster	Fabre	1184,10,20000,20000
 sec_in02,138,55,100,100	monster	Chonchon	1183,11,20000,20000
 sec_in02,138,55,100,100	monster	Spore	1014,12,20000,20000
 sec_in02,138,55,100,100	monster	Poison Spore	1077,3,20000,20000
+*/
