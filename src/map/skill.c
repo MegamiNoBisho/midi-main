@@ -1154,6 +1154,11 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 		status_heal(bl, 0, -drain, 0);
 		}
 		break;
+	
+	// Scylla - To fix none-stunning issue
+	case BS_HAMMERFALL:
+		sc_start(src,bl,SC_STUN,(10*skill_lv+20),skill_lv,skill_get_time2(skill_id,skill_lv));
+		break;
 
 	case WZ_FIREPILLAR:
 		unit_set_walkdelay(bl, tick, skill_get_time2(skill_id, skill_lv), 1);
@@ -4475,6 +4480,11 @@ int skill_castend_damage_id (struct block_list* src, struct block_list *bl, uint
 	case MO_TRIPLEATTACK:
 	case RK_WINDCUTTER:
 		skill_attack(BF_WEAPON,src,src,bl,skill_id,skill_lv,tick,flag|SD_ANIMATION);
+		break;
+	
+	// Scylla - Make Hammer Fall as attack skill
+	case BS_HAMMERFALL:
+		skill_attack(BF_WEAPON,src,src,bl,skill_id,skill_lv,tick,flag);
 		break;
 
 	case LK_JOINTBEAT: // decide the ailment first (affects attack damage and effect)
@@ -11526,12 +11536,23 @@ int skill_castend_pos2(struct block_list* src, int x, int y, uint16 skill_id, ui
 			skill_castend_damage_id);
 		break;
 
-	case BS_HAMMERFALL:
+	// Commented by Scylla ( Original Code )
+	/*case BS_HAMMERFALL:
 		i = skill_get_splash(skill_id, skill_lv);
 		map_foreachinarea(skill_area_sub,
 			src->m, x-i, y-i, x+i, y+i, BL_CHAR,
 			src, skill_id, skill_lv, tick, flag|BCT_ENEMY|2,
 			skill_castend_nodamage_id);
+		break;
+	*/ 
+	
+	// Scylla
+	case BS_HAMMERFALL:
+	i = skill_get_splash(skill_id, skill_lv);
+	map_foreachinarea(skill_area_sub,
+			src->m, x-i, y-i, x+i, y+i, BL_CHAR,
+			src, skill_id, skill_lv, tick, flag|BCT_ENEMY|2,
+			skill_castend_damage_id);
 		break;
 
 	case HT_DETECTING:
