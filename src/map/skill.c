@@ -1106,12 +1106,16 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 					if((sce=sc->data[SC_ENCPOISON])){ //Don't use sc_start since chance comes in 1/10000 rate.
 						status_change_start(src,bl,SC_POISON,sce->val2, sce->val1,src->id,0,0,
 							skill_get_time2(AS_ENCHANTPOISON,sce->val1),SCSTART_NONE);
+						// Enchant Poison Lifesteal by Hanashi
 						case AS_ENCHANTPOISON:
 							{
+							if(pc_checkskill(sd,AS_ENCHANTPOISON)>9){ // Lifesteal will only work if EP is Level 10 [Scylla]
 							int heal;
-							heal = (sstatus->max_hp * 1/100)*skill_lv;
+							//heal = (sstatus->max_hp * 1/100)*skill_lv; // Commented by Scylla
+							heal = (sstatus->max_hp * 1/100); // Removed skill_lv to fix 0 value lifesteal
 							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
 							status_heal(src, heal, 0, 0);
+								}
 							}
 							break;
 													}
