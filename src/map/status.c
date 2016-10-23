@@ -6432,9 +6432,6 @@ static unsigned short status_calc_speed(struct block_list *bl, struct status_cha
 				val = max( val, sc->data[SC_B_TRAP]->val3 );
 			if (sc->data[SC_CATNIPPOWDER])
 				val = max(val, sc->data[SC_CATNIPPOWDER]->val3);
-			// Scylla
-			if(pc_checkskill(sd,BS_ADRENALINE)>0) // Adrenaline Rush Movement Speed 3 * Skill LV ( Passive )
-				val = max (val, 3 * pc_checkskill(sd,BS_ADRENALINE));
 
 			if( sd && sd->bonus.speed_rate + sd->bonus.speed_add_rate > 0 ) // Permanent item-based speedup
 				val = max( val, sd->bonus.speed_rate + sd->bonus.speed_add_rate );
@@ -6480,6 +6477,9 @@ static unsigned short status_calc_speed(struct block_list *bl, struct status_cha
 			val = max( val, 25 );
 		if (sc->data[SC_ARCLOUSEDASH])
 			val = max(val, sc->data[SC_ARCLOUSEDASH]->val3);
+		// Scylla
+		if(pc_checkskill(sd,BS_ADRENALINE)>0) // Adrenaline Rush Movement Speed 3 * Skill LV ( Passive )
+			val = max (val, 3 * pc_checkskill(sd,BS_ADRENALINE));
 
 		// !FIXME: official items use a single bonus for this [ultramage]
 		if( sc->data[SC_SPEEDUP0] ) // Temporary item-based speedup
