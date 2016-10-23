@@ -3328,8 +3328,20 @@ int status_calc_pc_(struct map_session_data* sd, enum e_status_calc_opt opt)
 			if (sd->bonus.weapon_matk_rate)
 				wa->matk += wa->matk * sd->bonus.weapon_matk_rate / 100;
 #endif
-			if(r) // Overrefine bonus.
+			if (r) { // Overrefine bonus.
 				wd->overrefine = refine_info[wlv].randombonus_max[r-1] / 100;
+				// Refine bonus [Cydh]
+				if (refine_bonus[wlv][r-1].script) {
+					if (wd == &sd->left_weapon) {
+						sd->state.lr_flag = 1;
+						run_script(refine_bonus[wlv][r-1].script,0,sd->bl.id,0);
+						sd->state.lr_flag = 0;
+					} else
+						run_script(refine_bonus[wlv][r-1].script,0,sd->bl.id,0);
+					if (!calculating)
+						return 1;
+				}
+			}
 			wa->range += sd->inventory_data[index]->range;
 			if(sd->inventory_data[index]->script && (pc_has_permission(sd,PC_PERM_USE_ALL_EQUIPMENT) || !itemdb_isNoEquip(sd->inventory_data[index],sd->bl.m))) {
 				if (wd == &sd->left_weapon) {
@@ -3352,8 +3364,12 @@ int status_calc_pc_(struct map_session_data* sd, enum e_status_calc_opt opt)
 		} else if(sd->inventory_data[index]->type == IT_ARMOR) {
 			int r;
 
-			if ( (r = sd->status.inventory[index].refine) )
+			if ( (r = sd->status.inventory[index].refine) ) {
 				refinedef += refine_info[REFINE_TYPE_ARMOR].bonus[r-1];
+				// Refine bonus [Cydh]
+				if(refine_bonus[REFINE_TYPE_ARMOR][r-1].script)
+					run_script(refine_bonus[REFINE_TYPE_ARMOR][r-1].script,0,sd->bl.id,0);
+			}
 			if(sd->inventory_data[index]->script && (pc_has_permission(sd,PC_PERM_USE_ALL_EQUIPMENT) || !itemdb_isNoEquip(sd->inventory_data[index],sd->bl.m))) {
 				if( i == EQI_HAND_L ) // Shield
 					sd->state.lr_flag = 3;
@@ -13824,7 +13840,88 @@ static bool status_readdb_attrfix(const char *basedir,bool silent)
 	ShowStatus("Done reading '"CL_WHITE"%d"CL_RESET"' entries in '"CL_WHITE"%s"CL_RESET"'.\n", entries, path);
 	return true;
 }
+/// Refine bonus
+/// [Cydh] house.bad@gmail.com
+/// <Type>,<RefineNumber>,<{ Script }>
+static int status_readdb_refine_bonus(void)
+{
+	const char* filename = "refine_bonus.txt";
+	uint32 lines = 0, count = 0;
+	char line[1024], path[256];
+	FILE* fp;
 
+	sprintf(path, "%s/%s", db_path, filename);
+	if ((fp = fopen(path, "r")) == NULL ) {
+		ShowWarning("status_readdb_refine_bonus: File not found \"%s\", skipping.\n", path);
+		return 0;
+	}
+
+	while (fgets(line, sizeof(line), fp)) {
+		char *str[3], *p;
+		uint8 i, type, refine;
+
+		lines++;
+		if (line[0] == '/' && line[1] == '/')
+			continue;
+
+		memset(str, 0, sizeof(str));
+
+		p = line;
+
+		while (ISSPACE(*p))
+			++p;
+		if (*p == '\0')
+			continue;
+		for (i = 0; i < 2; ++i) {
+			str[i] = p;
+			p = strchr(p,',');
+			if (p == NULL)
+				break;
+			*p = '\0';
+			++p;
+		}
+
+		if (p == NULL) {
+			ShowError("status_readdb_refine_bonus: Insufficient columns in line %d of \"%s\" (item with type %d), skipping.\n", lines, path, atoi(str[0]));
+			continue;
+		}
+
+		// Equip type
+		type = atoi(str[0]);
+		if (type < REFINE_TYPE_ARMOR || type > REFINE_TYPE_WEAPON4) {
+			ShowError("status_readdb_refine_bonus : Invalid item type '%d'.\n",atoi(str[0]));
+			continue;
+		}
+
+		// Refine number
+		refine = atoi(str[1]);
+		if (refine < 1 || refine > MAX_REFINE) {
+			ShowError("status_readdb_refine_bonus : Invalid item refine number '%d' (1 - %d).\n",refine,MAX_REFINE);
+			continue;
+		}
+
+		// Script
+		if (*p != '{') {
+			ShowError("status_readdb_refine_bonus: Invalid format (Script column-start) in line %d of \"%s\" (script with item type %d and refine number %d), skipping.\n",lines,path,type,refine);
+			continue;
+		}
+		str[2] = p;
+		p = strstr(p+1,"}");
+		if (strchr(p,',') != NULL) {
+			ShowError("status_readdb_refine_bonus: Invalid format (Script column-end) in line %d of \"%s\" (script with item type %d and refine number %d), skipping.\n",lines,path,type,refine);
+			continue;
+		}
+
+		refine_bonus[type][refine-1].script = parse_script(str[2],path,lines,0);
+		count++;
+	}
+
+	fclose(fp);
+	
+	ShowStatus("Done reading '"CL_WHITE"%lu"CL_RESET"' entries in '"CL_WHITE"%s"CL_RESET"'.\n", count, filename);
+
+	return 0;
+}
 /**
  * Sets defaults in tables and starts read db functions
  * sv_readdb reads the file, outputting the information line-by-line to
@@ -13890,6 +13987,10 @@ int status_readdb(void)
 		aFree(dbsubpath1);
 		aFree(dbsubpath2);
 	}
+	// Refine bonus [Cydh]
+	memset(refine_bonus,0,sizeof(refine_bonus));
+	status_readdb_refine_bonus();
+
 	return 0;
 }
 

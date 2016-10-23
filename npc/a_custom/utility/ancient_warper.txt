@@ -63,7 +63,7 @@
 				case 0:	/*Alberta*/	KnownMaps(#Known_Alberta,@KnownMapsError$);	ZenyCheck(.WarpPrice);	warp "alberta",32,234;	break;
 				case 1:	/*Aldebaran*/	KnownMaps(#Known_Aldebaran,@KnownMapsError$);	ZenyCheck(.WarpPrice);	warp "aldebaran",140,112;	break;
 				case 2:	/*Geffen*/	KnownMaps(#Known_Geffen,@KnownMapsError$);	ZenyCheck(.WarpPrice);	warp "geffen",120,71;	break;
-				case 3:	/*Izlude*/	KnownMaps(#Known_Izlude,@KnownMapsError$);	ZenyCheck(.WarpPrice);	warp "izlude",128,128;	break;
+				case 3:	/*Izlude*/	KnownMaps(#Known_Izlude,@KnownMapsError$);	ZenyCheck(.WarpPrice);	warp "izlude",127,108;	break;
 				case 4:	/*Morroc*/	KnownMaps(#Known_Morroc,@KnownMapsError$);	ZenyCheck(.WarpPrice);	warp "morocc",156,93;	break;
 				case 5:	/*Payon*/		KnownMaps(#Known_Payon,@KnownMapsError$);	ZenyCheck(.WarpPrice);	warp "payon_mem",90,106;	break;
 				case 6:	/*Prontera*/	KnownMaps(#Known_Prontera,@KnownMapsError$);	ZenyCheck(.WarpPrice);	warp "prontera",155,175;	break;
