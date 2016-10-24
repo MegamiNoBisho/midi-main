@@ -7656,9 +7656,16 @@ int status_get_sc_def(struct block_list *src, struct block_list *bl, enum sc_typ
 	switch (type) {
 		case SC_POISON:
 		case SC_DPOISON:
-			// Removed VIT / LUK resistance thus making poison 100% even with VIT / LUK
-			//sc_def = status->vit*100; // Commented by Scylla
-			//sc_def2 = status->luk*10 + status_get_lv(bl)*10 - status_get_lv(src)*10; // Commented by Scylla
+			// Assassins now ignores VIT / LUK resistance on poison [Scylla] (Code by Cydh)
+			{
+                	TBL_PC *ssd = BL_CAST(BL_PC,src);
+                	if (ssd && (ssd->class_&MAPID_UPPERMASK) == MAPID_ASSASSIN){
+                    	;
+                	} else {
+			sc_def = status->vit*100;
+			sc_def2 = status->luk*10 + status_get_lv(bl)*10 - status_get_lv(src)*10;
+				}
+			}
 			if (sd) {
 				// For players: 60000 - 450*vit - 100*luk
 				tick_def = status->vit*75;
