@@ -237,7 +237,7 @@ void initChangeTables(void)
 	add_sc( AL_PNEUMA		, SC_PNEUMA		);
 	set_sc( AL_INCAGI		, SC_INCREASEAGI	, SI_INCREASEAGI	, SCB_AGI|SCB_SPEED );
 	set_sc( AL_DECAGI		, SC_DECREASEAGI	, SI_DECREASEAGI	, SCB_AGI|SCB_SPEED );
-	set_sc( AL_CRUCIS		, SC_SIGNUMCRUCIS	, SI_SIGNUMCRUCIS	, SCB_DEF );
+	set_sc( AL_CRUCIS		, SC_SIGNUMCRUCIS	, SI_SIGNUMCRUCIS	, SCB_NONE );
 	set_sc( AL_ANGELUS		, SC_ANGELUS		, SI_ANGELUS		, SCB_DEF2 );
 	set_sc( AL_BLESSING		, SC_BLESSING		, SI_BLESSING		, SCB_STR|SCB_INT|SCB_DEX );
 	set_sc( AC_CONCENTRATION	, SC_CONCENTRATE	, SI_CONCENTRATE	, SCB_AGI|SCB_DEX );
@@ -263,7 +263,7 @@ void initChangeTables(void)
 	set_sc( PR_LEXAETERNA		, SC_AETERNA		, SI_AETERNA		, SCB_NONE );
 	add_sc( WZ_METEOR		, SC_STUN		);
 	add_sc( WZ_VERMILION		, SC_BLIND		);
-	add_sc( WZ_FROSTNOVA		, SC_FREEZE		);
+	add_sc( WZ_FROSTNOVA, SC_FROSTCOAT );
 	add_sc( WZ_STORMGUST		, SC_FREEZE		);
 	set_sc( WZ_QUAGMIRE		, SC_QUAGMIRE		, SI_QUAGMIRE		, SCB_AGI|SCB_DEX|SCB_ASPD|SCB_SPEED );
 	add_sc( BS_HAMMERFALL		, SC_STUN		);
@@ -1295,7 +1295,6 @@ void initChangeTables(void)
 
 	/* StatusChangeState (SCS_) NOMOVE */
 	StatusChangeStateTable[SC_ANKLE]				|= SCS_NOMOVE;
-	StatusChangeStateTable[SC_AUTOCOUNTER]			|= SCS_NOMOVE;
 	StatusChangeStateTable[SC_TRICKDEAD]			|= SCS_NOMOVE;
 	StatusChangeStateTable[SC_BLADESTOP]			|= SCS_NOMOVE;
 	StatusChangeStateTable[SC_BLADESTOP_WAIT]		|= SCS_NOMOVE;
@@ -1338,7 +1337,6 @@ void initChangeTables(void)
 	StatusChangeStateTable[SC_SUHIDE]				|= SCS_NOPICKITEM;
 
 	/* StatusChangeState (SCS_) NODROPITEMS */
-	StatusChangeStateTable[SC_AUTOCOUNTER]			|= SCS_NODROPITEM;
 	StatusChangeStateTable[SC_BLADESTOP]			|= SCS_NODROPITEM;
 	StatusChangeStateTable[SC_NOCHAT]				|= SCS_NODROPITEM|SCS_NODROPITEMCOND;
 
@@ -1607,14 +1605,6 @@ int status_damage(struct block_list *src,struct block_list *target,int64 dhp, in
 			status_change_end(target, SC_CAMOUFLAGE, INVALID_TIMER);
 			status_change_end(target, SC_DEEPSLEEP, INVALID_TIMER);
 			status_change_end(target, SC_SUHIDE, INVALID_TIMER);
-			if ((sce=sc->data[SC_ENDURE]) && !sce->val4) {
-				/** [Skotlex]
-				* Endure count is only reduced by non-players on non-gvg maps.
-				* val4 signals infinite endure.
-				**/
-				if (src && src->type != BL_PC && !map_flag_gvg(target->m) && !map[target->m].flag.battleground && --(sce->val2) < 0)
-					status_change_end(target, SC_ENDURE, INVALID_TIMER);
-			}
 			if ((sce=sc->data[SC_GRAVITATION]) && sce->val3 == BCT_SELF) {
 				struct skill_unit_group* sg = skill_id2group(sce->val4);
 				if (sg) {
@@ -3613,6 +3603,8 @@ int status_calc_pc_(struct map_session_data* sd, enum e_status_calc_opt opt)
 		base_status->str += skill;
 	if((skill = pc_checkskill(sd,BS_WEAPONPERFECT))>0) // Weapon Perfection +1 DEX * Skill LV
 		base_status->dex += skill;
+	if((skill=pc_checkskill(sd,HT_TRAP_MASTERY))>0)
+		base_status->int_ += skill;
 
 	// Bonuses from cards and equipment as well as base stat, remember to avoid overflows.
 	i = base_status->str + sd->status.str + sd->param_bonus[0] + sd->param_equip[0];
@@ -8201,11 +8193,6 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 		if(sc->opt1 || sc->data[SC_FREEZING])
 			return 0;
 		break;
-	case SC_SIGNUMCRUCIS:
-		// Only affects demons and undead element (but not players)
-		if((!undead_flag && status->race!=RC_DEMON) || bl->type == BL_PC)
-			return 0;
-	break;
 	case SC_AETERNA:
 		if( (sc->data[SC_STONE] && sc->opt1 == OPT1_STONE) || sc->data[SC_FREEZE] )
 			return 0;
@@ -8460,6 +8447,15 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 		break;
 	case SC_KINGS_GRACE:
 		if (sc->data[SC_DEVOTION] || sc->data[SC_WHITEIMPRISON])
+			return 0;
+		break;
+
+	case SC_FROSTCOAT:
+		if (sc->data[SC_ENERGYCOAT])
+			return 0;
+		break;
+	case SC_ENERGYCOAT:
+		if (sc->data[SC_FROSTCOAT])
 			return 0;
 		break;
 
@@ -9057,6 +9053,7 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 			break;
 		case SC_SIGNUMCRUCIS:
 			val2 = 10 + 4*val1; // Def reduction
+			val3 = 2 * val1; // Resist reductions
 			tick = -1;
 			clif_emotion(bl,E_SWT);
 			break;
@@ -10642,6 +10639,9 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 			val2 = (status->max_hp * (val1 * 10) / 100); // %Max HP to absorb
 			//val3 = 6 + val1; // Hits !TODO: Does it have hits too?
 			break;
+		case SC_FROSTCOAT:
+			val2 = 3 * val1; // Freezing chance
+			break;
 
 		default:
 			if( calc_flag == SCB_NONE && StatusSkillChangeTable[type] == -1 && StatusIconChangeTable[type] == SI_BLANK ) {
@@ -10890,6 +10890,7 @@ int status_change_start(struct block_list* src, struct block_list* bl,enum sc_ty
 			opt_flag = 0;
 			break;
 		case SC_ENERGYCOAT:
+		case SC_FROSTCOAT:
 		case SC_SKE:
 			sc->opt3 |= OPT3_ENERGYCOAT;
 			opt_flag = 0;
@@ -11991,6 +11992,7 @@ int status_change_end_(struct block_list* bl, enum sc_type type, int tid, const 
 			opt_flag = 0;
 		break;
 	case SC_ENERGYCOAT:
+	case SC_FROSTCOAT:
 	case SC_SKE:
 		sc->opt3 &= ~OPT3_ENERGYCOAT;
 		opt_flag = 0;

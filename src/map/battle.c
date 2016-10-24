@@ -471,6 +471,8 @@ int64 battle_attr_fix(struct block_list *src, struct block_list *target, int64 d
 	}
 
 	if (tsc && tsc->count) { //increase dmg by target status
+		if (tsc->data[SC_SIGNUMCRUCIS] && atk_elem != ELE_NEUTRAL)
+			ratio += tsc->data[SC_SIGNUMCRUCIS]->val2;
 		switch(atk_elem) {
 			case ELE_FIRE:
 				if (tsc->data[SC_SPIDERWEB]) {
@@ -1333,6 +1335,10 @@ int64 battle_calc_damage(struct block_list *src,struct block_list *bl,struct Dam
 			if (!status_charge(bl, 0, (10+5*per)*status->max_sp/1000))
 				status_change_end(bl, SC_ENERGYCOAT, INVALID_TIMER);
 			damage -= damage * 6 * (1 + per) / 100; //Reduction: 6% + 6% every 20%
+		}
+		// Freeze the attacker
+		if( (sce = sc->data[SC_FROSTCOAT]) ) {
+			sc_start(bl, src, SC_FREEZE, sce->val2, sc->data[SC_FROSTCOAT]->val1, skill_get_time2(WZ_FROSTNOVA,sc->data[SC_FROSTCOAT]->val1));
 		}
 
 		if(sc->data[SC_GRANITIC_ARMOR])
@@ -2336,11 +2342,6 @@ static bool is_attack_critical(struct Damage wd, struct block_list *src, struct 
 			cri <<= 1;
 
 		switch(skill_id) {
-			case 0:
-				if(sc && !sc->data[SC_AUTOCOUNTER])
-					break;
-				clif_specialeffect(src, 131, AREA);
-				status_change_end(src, SC_AUTOCOUNTER, INVALID_TIMER);
 			case KN_AUTOCOUNTER:
 				if(battle_config.auto_counter_type &&
 					(battle_config.auto_counter_type&src->type))
@@ -4984,6 +4985,14 @@ struct Damage battle_calc_weapon_final_atk_modifiers(struct Damage wd, struct bl
 			status_change_end(target, SC_REJECTSWORD, INVALID_TIMER);
 	}
 
+	// KN_AUTOCOUNTER effect
+	if (wd.damage && tsc && tsc->data[SC_AUTOCOUNTER] && wd.flag&(BF_SHORT|BF_WEAPON)) {
+		ATK_RATER(wd.damage, 50)
+		status_fix_damage(target,src,wd.damage,clif_damage(target,src,gettick(),0,0,wd.damage,0,DMG_NORMAL,0,false));
+		clif_skill_nodamage(target,target,ST_REJECTSWORD,tsc->data[SC_AUTOCOUNTER]->val1,1);
+		status_change_end(target, SC_AUTOCOUNTER, INVALID_TIMER);
+	}
+
 	if( tsc && tsc->data[SC_CRESCENTELBOW] && wd.flag&BF_SHORT && rnd()%100 < tsc->data[SC_CRESCENTELBOW]->val2 ) {
 		//ATK [{(Target HP / 100) x Skill Level} x Caster Base Level / 125] % + [Received damage x {1 + (Skill Level x 0.2)}]
 		int64 rdamage = 0;
@@ -5365,6 +5374,13 @@ static struct Damage battle_calc_weapon_attack(struct block_list *src, struct bl
 				}
 				if(sd->weapontype1 == W_FIST && sd->weapontype2 == W_FIST)
 					ATK_ADD(wd.damage, wd.damage2, 10 * skill - i);
+			}
+			break;
+		case HT_FREEZINGTRAP:
+			if (sd) {
+				int i = pc_checkskill(sd,HT_TRAP_MASTERY);
+				if (i > 0)
+					ATK_ADDRATE(wd.damage, wd.damage2, i);
 			}
 			break;
 		case SR_TIGERCANNON:
@@ -6371,6 +6387,7 @@ struct Damage battle_calc_misc_attack(struct block_list *src,struct block_list *
 				if(!sd || !(skill = pc_checkskill(sd,HT_STEELCROW)))
 					skill = 0;
 				md.damage = (sstatus->dex / 10 + sstatus->int_ / 2 + skill * 3 + 40) * 2;
+				md.damage += md.damage * 2 * skill / 100; // +2% Falcon's damage each level
 				if(mflag > 1) //Autocasted Blitz
 					nk |= NK_SPLASHSPLIT;
 				if (skill_id == SN_FALCONASSAULT) {
@@ -6614,6 +6631,20 @@ struct Damage battle_calc_misc_attack(struct block_list *src,struct block_list *
 		case GS_MAGICALBULLET:
 			break; // Card fix already done
 #endif
+		case HT_LANDMINE:
+		case HT_SANDMAN:
+		case HT_FLASHER:
+		case HT_BLASTMINE:
+		case HT_CLAYMORETRAP:
+		case RA_MAGENTATRAP:
+		case RA_COBALTTRAP:
+		case RA_MAIZETRAP:
+		case RA_VERDURETRAP:
+		case RA_FIRINGTRAP:
+		case RA_ICEBOUNDTRAP:
+			if (sd && (i = pc_checkskill(sd,HT_TRAP_MASTERY)) > 0)
+				md.damage += md.damage*2/100;
+			// fall through
 		default:
 			md.damage += battle_calc_cardfix(BF_MISC, src, target, nk, s_ele, 0, md.damage, 0, md.flag);
 			break;
@@ -7075,21 +7106,6 @@ enum damage_lv battle_weapon_attack(struct block_list* src, struct block_list* t
 			status_change_end(src, SC_CLOAKING, INVALID_TIMER);
 		else if (sc->data[SC_CLOAKINGEXCEED] && !(sc->data[SC_CLOAKINGEXCEED]->val4 & 2))
 			status_change_end(src, SC_CLOAKINGEXCEED, INVALID_TIMER);
-	}
-	if (tsc && tsc->data[SC_AUTOCOUNTER] && status_check_skilluse(target, src, KN_AUTOCOUNTER, 1)) {
-		uint8 dir = map_calc_dir(target,src->x,src->y);
-		int t_dir = unit_getdir(target);
-		int dist = distance_bl(src, target);
-
-		if (dist <= 0 || (!map_check_dir(dir,t_dir) && dist <= tstatus->rhw.range+1)) {
-			uint16 skill_lv = tsc->data[SC_AUTOCOUNTER]->val1;
-
-			clif_skillcastcancel(target); //Remove the casting bar. [Skotlex]
-			clif_damage(src, target, tick, sstatus->amotion, 1, 0, 1, DMG_NORMAL, 0, false); //Display MISS.
-			status_change_end(target, SC_AUTOCOUNTER, INVALID_TIMER);
-			skill_attack(BF_WEAPON,target,target,src,KN_AUTOCOUNTER,skill_lv,tick,0);
-			return ATK_BLOCK;
-		}
 	}
 
 	if( tsc && tsc->data[SC_BLADESTOP_WAIT] && status_get_class_(src) != CLASS_BOSS && (src->type == BL_PC || tsd == NULL || distance_bl(src, target) <= (tsd->status.weapon == W_FIST ? 1 : 2)) )

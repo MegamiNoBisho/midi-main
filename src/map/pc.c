@@ -5647,6 +5647,12 @@ int pc_get_skillcooldown(struct map_session_data *sd, uint16 skill_id, uint16 sk
 	if (skill_db[idx]->cooldown[skill_lv - 1])
 		cooldown = skill_db[idx]->cooldown[skill_lv - 1];
 
+	// Ignore bonuses
+	switch (skill_id) {
+		case WZ_ESTIMATION:
+			return cooldown;
+	}
+
 	ARR_FIND(0, cooldownlen, i, sd->skillcooldown[i].id == skill_id);
 	if (i < cooldownlen) {
 		cooldown += sd->skillcooldown[i].val;
@@ -9870,9 +9876,6 @@ bool pc_unequipitem(struct map_session_data *sd, int n, int flag) {
 		pc_checkallowskill(sd);
 		status_calc_pc(sd,SCO_NONE);
 	}
-
-	if(sd->sc.data[SC_SIGNUMCRUCIS] && !battle_check_undead(sd->battle_status.race,sd->battle_status.def_ele))
-		status_change_end(&sd->bl, SC_SIGNUMCRUCIS, INVALID_TIMER);
 
 	//OnUnEquip script [Skotlex]
 	if (sd->inventory_data[n]) {
