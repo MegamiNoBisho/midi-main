@@ -1728,6 +1728,7 @@ enum si_type {
 	SI_GLOOM_CARD = 988,
 	SI_PHARAOH_CARD = 989,
 	SI_KIEL_CARD = 990,
+	SI_FROSTCOAT = 1200,
 	SI_MAX,
 };
 

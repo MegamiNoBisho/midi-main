@@ -1337,8 +1337,8 @@ int64 battle_calc_damage(struct block_list *src,struct block_list *bl,struct Dam
 			damage -= damage * 6 * (1 + per) / 100; //Reduction: 6% + 6% every 20%
 		}
 		// Freeze the attacker
-		if( (sce = sc->data[SC_FROSTCOAT]) ) {
-			sc_start(bl, src, SC_FREEZE, sce->val2, sc->data[SC_FROSTCOAT]->val1, skill_get_time2(WZ_FROSTNOVA,sc->data[SC_FROSTCOAT]->val1));
+		if( (sce = sc->data[SC_FROSTCOAT]) && rnd()%100 <= sce->val2 ) {
+			status_change_start(bl, src, SC_FREEZE, 10000, sce->val1, 0, 0, 0, skill_get_time2(WZ_FROSTNOVA,sce->val1), SCSTART_NORATEDEF|SCSTART_NOTICKDEF);
 		}
 
 		if(sc->data[SC_GRANITIC_ARMOR])

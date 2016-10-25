@@ -263,7 +263,7 @@ void initChangeTables(void)
 	set_sc( PR_LEXAETERNA		, SC_AETERNA		, SI_AETERNA		, SCB_NONE );
 	add_sc( WZ_METEOR		, SC_STUN		);
 	add_sc( WZ_VERMILION		, SC_BLIND		);
-	add_sc( WZ_FROSTNOVA, SC_FROSTCOAT );
+	set_sc( WZ_FROSTNOVA, SC_FROSTCOAT, SI_FROSTCOAT, SCB_NONE );
 	add_sc( WZ_STORMGUST		, SC_FREEZE		);
 	set_sc( WZ_QUAGMIRE		, SC_QUAGMIRE		, SI_QUAGMIRE		, SCB_AGI|SCB_DEX|SCB_ASPD|SCB_SPEED );
 	add_sc( BS_HAMMERFALL		, SC_STUN		);
@@ -2042,7 +2042,6 @@ bool status_check_skilluse(struct block_list *src, struct block_list *target, ui
 
 		if (
 			(sc->data[SC_TRICKDEAD] && skill_id != NV_TRICKDEAD)
-			|| (sc->data[SC_AUTOCOUNTER] && !flag && skill_id)
 			|| (sc->data[SC_GOSPEL] && sc->data[SC_GOSPEL]->val4 == BCT_SELF && skill_id != PA_GOSPEL)
 			|| (sc->data[SC_SUHIDE] && skill_id != SU_HIDE)
 		)
