@@ -94,17 +94,24 @@ OnHuntList:
 		case 11: callfunc("F_HuntGen","moc_pryd02","the second floor of Pyramids Dungeon","85035|85036","Archer Skeleton|Skeleton Soldier","50|50",5000,110000,75000,"7539|1");
 		case 12: callfunc("F_HuntGen","moc_pryd03","the third floor of Pyramids Dungeon","85037|85038|85039|85040","Verit|Mummy|Matyr|Mimic","25|50|25|25",25000,300000,195000,"7539|1");
 		case 13: callfunc("F_HuntGen","moc_pryd04","the fourth floor of Pyramids Dungeon","85041|85043|85043|85044|85045","Isis|Ghoul|Mummy|Matyr|Osiris","50|30|30|30|1",25000,3500000,2095000,"7539|1");
-		case 14: callfunc("F_HuntGen","moc_pryd05","the first basement of Pyramids Dungeon","85037|85038|85043|85046","Verit|Mummy|Ghoul|Minorous","50|50|10|50",50000,4602600,2612400,"7539|1");
-		case 15: callfunc("F_HuntGen","moc_pryd06","the second basement of Pyramids Dungeon","85037|85038|85040|85041|85047|85048","Verit|Mummy|Mimic|Isis|Ancient Mummy|Amon Ra","20|40|40|20|20|1",50000,6466600,3263600,"7539|1");
-		case 16: callfunc("F_HuntGen","in_sphinx1","the first floor of Sphinx Dungeon","85049|85050|85051|85052","Anacondaq|Drainliar|Requiem|Zerom","30|20|10|50",10000,752400,400400,"7539|1");
-		case 17: callfunc("F_HuntGen","in_sphinx2","the second floor of Sphinx Dungeon","85050|85053|85051|85052|85054","Drainliar|Matyr|Requiem|Zerom|Whisper","30|50|20|40|10",20000,1855800,934800,"7539|1");
-		case 18: callfunc("F_HuntGen","in_sphinx3","the third floor of Sphinx Dungeon","85050|85055|85053|85051|85054|85056","Drainliar|Marduk|Matyr|Requiem|Whisper|Mimic","40|10|40|50|20|10",30000,2435400,1347400,"7539|1");
-		case 19: callfunc("F_HuntGen","in_sphinx4","the fourth floor of Sphinx Dungeon","85057|85058|85055|85059|85056","Sidewinder|Evil Druid|Marduk|Minorous|Mimic","30|10|50|50|10",40000,5796600,3125200,"7539|1");
-		case 20: callfunc("F_HuntGen","in_sphinx5","the fifth floor of Sphinx Dungeon","85057|85055|85053|85051|85054|85056|85060|85061","Sidewinder|Marduk|Matyr|Requiem|Whisper|Mimic|Wraith|Pharaoh","30|50|20|50|20|10|10|1",50000,4331600,2461000,"7539|1");
-		case 21: callfunc("F_HuntGen","gl_prison","the Glast Heim Prison Dungeon","85062|85063|85064|85065|85066|85067","Hunter Fly|Whisper|Skeleton Prisoner|Zombie Prisoner|Brilight|Zherlthsh","20|20|50|50|40|1",50000,7477160,5017280,"7539|1");		
-		case 22: callfunc("F_HuntGen","gl_prison1","the Glast Heim Prison 1 Dungeon","85068|85069|85066|85070|85067","Arclouse|Cramp|Brilight|Injustice|Zherlthsh","40|50|40|50|1",50000,6638960,4911880,"7539|1");		
-		case 23: callfunc("F_HuntGen","gl_knt01","the Glast Heim Chivalry F1 Dungeon","85066|85071|85072|85073|85074","Brilight|Raydric|Raydric Archer|Evil Druid|Rideword","20|50|50|10|30",75000,8947600,6681400,"7539|1");		
-		case 24: callfunc("F_HuntGen","gl_knt02","the Glast Heim Chivalry F2 Dungeon","85071|85072|85075|85076|85077|85078","Raydric|Raydric Archer|Khalitzburg|Joker|Knight of Abyss|Blood Knight","50|50|20|20|10|1",100000,9871000,6101200,"7539|1");		
+		case 14: callfunc("F_HuntGen","moc_pryd05","the first basement of Pyramids Dungeon","85046|85047|85048|85049","Verit|Mummy|Ghoul|Minorous","50|50|10|50",50000,4602600,2612400,"7539|1");
+		case 15: callfunc("F_HuntGen","moc_pryd06","the second basement of Pyramids Dungeon","85050|85051|85052|85053|85054|85055","Verit|Mummy|Mimic|Isis|Ancient Mummy|Amon Ra","20|40|40|20|20|1",50000,6466600,3263600,"7539|1");
+		case 16: callfunc("F_HuntGen","in_sphinx1","the first floor of Sphinx Dungeon","85056|85057|85058|85059","Anacondaq|Drainliar|Requiem|Zerom","30|20|10|50",10000,752400,400400,"7539|1");
+		case 17: callfunc("F_HuntGen","in_sphinx2","the second floor of Sphinx Dungeon","85060|85061|85062|85063|85064","Drainliar|Matyr|Requiem|Zerom|Whisper","30|50|20|40|10",20000,1855800,934800,"7539|1");
+		case 18: callfunc("F_HuntGen","in_sphinx3","the third floor of Sphinx Dungeon","85065|85066|85067|85068|85069|85070","Drainliar|Marduk|Matyr|Requiem|Whisper|Mimic","40|10|40|50|20|10",30000,2435400,1347400,"7539|1");
+		case 19: callfunc("F_HuntGen","in_sphinx4","the fourth floor of Sphinx Dungeon","85071|85072|85073|85074|85075","Sidewinder|Evil Druid|Marduk|Minorous|Mimic","30|10|50|50|10",40000,5796600,3125200,"7539|1");
+		case 20: callfunc("F_HuntGen","in_sphinx5","the fifth floor of Sphinx Dungeon","85076|85077|85078|85079|85080|85081|85082|85083","Sidewinder|Marduk|Matyr|Requiem|Whisper|Mimic|Wraith|Pharaoh","30|50|20|50|20|10|10|1",50000,4331600,2461000,"7539|1");
+		case 21: callfunc("F_HuntGen","gl_prison","the first floor of Glast Heim Prison Dungeon","85084|85085|85086|85087|85088|85089","Hunter Fly|Whisper|Skeleton Prisoner|Zombie Prisoner|Brilight|Zherlthsh","20|20|50|50|40|1",50000,7477160,5017280,"7539|1");		
+		case 22: callfunc("F_HuntGen","gl_prison1","the second floor of Glast Heim Prison Dungeon","85090|85091|85092|85093|85094","Arclouse|Cramp|Brilight|Injustice|Zherlthsh","40|50|40|50|1",50000,6638960,4911880,"7539|1");		
+		case 23: callfunc("F_HuntGen","gl_knt01","the first floor of Glast Heim Chivalry Dungeon","85095|85096|85097|85098|85099","Brilight|Raydric|Raydric Archer|Evil Druid|Rideword","20|50|50|10|30",75000,8947600,6681400,"7539|1");		
+		case 24: callfunc("F_HuntGen","gl_knt02","the second floor of Glast Heim Chivalry Dungeon","85100|85101|85102|85103|85104|85105","Raydric|Raydric Archer|Khalitzburg|Joker|Knight of Abyss|Blood Knight","50|50|20|20|1|1",100000,9871000,6101200,"7539|1");		
+		case 25: callfunc("F_HuntGen","gef_dun00","the first basement of Geffen Dungeon","85106|85107|85108|85109","Familiar|Poporing|Poison Spore|Dustiness","30|30|50|20",20000,338600,184400,"7539|1");		
+		case 26: callfunc("F_HuntGen","gef_dun01","the second basement of Geffen Dungeon","85110|85111|85112|85113|85114|85115","Familiar|Poison Spore|Argos|Dustiness|Jakk|Whisper","20|20|40|30|20|30",25000,1168200,1017000,"7539|1");		
+		case 27: callfunc("F_HuntGen","gef_dun02","the third basement of Geffen Dungeon","85116|85117|85118|85119|85120|85121|85122|85123","Nightmare|Argos|Bathory|Jakk|Marionette|Myst|Whisper|Doppelganger","10|30|10|20|20|20|50|1",50000,3932600,2293700,"7539|1");		
+		case 28: callfunc("F_HuntGen","orcsdun01","the first floor of Orc Dungeon","85124|85125|85126|85127|85128|85129|85130","Familiar|ChonChon|Steel ChonChon|Drainliar|Martin|Orc Skeleton|Orc Zombie","20|10|20|10|10|20|50",20000,490800,285200,"7539|1");		
+		case 29: callfunc("F_HuntGen","orcsdun02","the second floor of Orc Dungeon","85131|85132|85133|85134|85135|85136|85137","Familiar|ChonChon|Steel ChonChon|Orc Skeleton|Zenorc|Orc Archer|Orc Lord","20|20|20|50|50|10|1",50000,2928700,1166000,"7539|1");		
+		case 30: callfunc("F_HuntGen","xmas_dun01","the first floor of Toy Factory Dungeon","85138|85139|85140|85141|85142|85143|85144|85145|85146|85147","Poring|Poporing|Mastering|Angeling|Drops|Marin|Christmas Cookie|Myst Case|Chepet|Cookie","20|40|1|1|20|40|50|10|1|30",25000,1023820,628400,"7539|1");		
+		case 31: callfunc("F_HuntGen","xmas_dun02","the second floor of Toy Factory Dungeon","85148|85149|85150|85151","Christmas Cookie|Cruiser|Myst Case|Stormy Knight","20|50|50|1",50000,3684400,1680600,"7539|1");		
 		default:	dispbottom "No available quests in this map.";
 	}
 	end;
@@ -117,7 +124,7 @@ OnInit:
 				 "moc_pryd01","moc_pryd02","moc_pryd03","moc_pryd04","moc_pryd05","moc_pryd06",	// morroc - 6
 				 "in_sphinx1","in_sphinx2","in_sphinx3","in_sphinx4","in_sphinx5",		// morroc - 5
 				 "gl_prison","gl_prison1","gl_knt01","gl_knt02",				//glast heim - geffen - 4
-				 "gef_dun01","gef_dun02","gef_dun03",						//geffen tower - geffen - 3
+				 "gef_dun00","gef_dun01","gef_dun02",						//geffen tower - geffen - 3
 				 "orcsdun01","orcsdun02",							//orc dungeon - geffen - 2
 				 "xmas_dun01","xmas_dun02",							//toy factory - lutie - 2
 				 "iz_dun01","iz_dun02","iz_dun03","iz_dun04",					//byalan dungeon - izlude - 4
