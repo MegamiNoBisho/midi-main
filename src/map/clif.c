@@ -10889,7 +10889,6 @@ void clif_parse_ActionRequest_sub(struct map_session_data *sd, int action_type, 
 	// (not all are included in pc_can_attack)
 	if (sd->sc.count &&
 		(sd->sc.data[SC_TRICKDEAD] ||
-		(sd->sc.data[SC_AUTOCOUNTER] && action_type != 0x07) ||
 		 sd->sc.data[SC_BLADESTOP] ||
 		 sd->sc.data[SC__MANHOLE] ||
 		 sd->sc.data[SC_SUHIDE] ))
@@ -11211,7 +11210,6 @@ void clif_parse_DropItem(int fd, struct map_session_data *sd){
 			break;
 
 		if (sd->sc.count && (
-			sd->sc.data[SC_AUTOCOUNTER] ||
 			sd->sc.data[SC_BLADESTOP] ||
 			(sd->sc.data[SC_NOCHAT] && sd->sc.data[SC_NOCHAT]->val1&MANNER_NOITEM)
 		))
