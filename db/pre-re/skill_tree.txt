@@ -263,7 +263,7 @@
 11,1009,1,0,0,0,0,0,0,0,0,0,0 //HT_PHANTASMIC#Phantasmic Arrow#
 11,410,1,0,0,0,0,0,0,0,0,0,0 //WE_CALLBABY#Call Baby#
 11,499,1,46,10,0,0,0,0,0,0,0,0	//HT_POWER#Beast Strafing#
-11,1100,5,0,0,0,0,0,0,0,0,0,0	//HT_TRAP_MASTERY#Trap Mastery#
+11,1100,10,0,0,0,0,0,0,0,0,0,0	//HT_TRAP_MASTERY#Trap Mastery#
 //Assassin
 12,1,9,0,0,0,0,0,0,0,0,0,0 //NV_BASIC#Basic Skill#
 12,142,1,0,0,0,0,0,0,0,0,0,0 //NV_FIRSTAID#First Aid#
