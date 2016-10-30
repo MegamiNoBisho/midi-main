@@ -1106,12 +1106,16 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 					if((sce=sc->data[SC_ENCPOISON])){ //Don't use sc_start since chance comes in 1/10000 rate.
 						status_change_start(src,bl,SC_POISON,sce->val2, sce->val1,src->id,0,0,
 							skill_get_time2(AS_ENCHANTPOISON,sce->val1),SCSTART_NONE);
+						// Enchant Poison Lifesteal by Hanashi
 						case AS_ENCHANTPOISON:
 							{
+							if(pc_checkskill(sd,AS_ENCHANTPOISON)>9){ // Lifesteal will only work if EP is Level 10 [Scylla]
 							int heal;
-							heal = (sstatus->max_hp * 1/100)*skill_lv;
+							//heal = (sstatus->max_hp * 1/100)*skill_lv; // Commented by Scylla
+							heal = (sstatus->max_hp * 1/100); // Removed skill_lv to fix 0 value lifesteal
 							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
 							status_heal(src, heal, 0, 0);
+								}
 							}
 							break;
 													}
@@ -6400,6 +6404,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 		map_foreachinshootrange(skill_area_sub, src, skill_get_splash(skill_id, skill_lv), BL_SKILL|BL_CHAR,
 			src,skill_id,skill_lv,tick, flag|BCT_ENEMY|1, skill_castend_damage_id);
 		clif_skill_nodamage (src,src,skill_id,skill_lv,1);
+		sc_start2(src,src,SC_ENCHANTARMS,100,1,ELE_FIRE,skill_get_time2(skill_id, skill_lv)); // Enchant with fire element
 		// Initiate 20% of your damage becomes fire element.
 		sc_start4(src,src,SC_WATK_ELEMENT,100,3,20,0,0,skill_get_time2(skill_id, skill_lv));
 		if( sd )
@@ -6513,8 +6518,8 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
  		break;
 
 	case KN_AUTOCOUNTER:
-		sc_start(src,bl,type,100,skill_lv,skill_get_time(skill_id,skill_lv));
-		skill_addtimerskill(src,tick + 100,bl->id,0,0,skill_id,skill_lv,BF_WEAPON,flag);
+		clif_skill_nodamage(src,bl,skill_id,skill_lv,
+			sc_start(src,bl,type,100,skill_lv,skill_get_time(skill_id,skill_lv)));
 		break;
 
 	case SO_STRIKING:
@@ -6931,11 +6936,8 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 		break;
 
 	case WZ_FROSTNOVA:
-		clif_skill_nodamage(src,bl,skill_id,skill_lv,1);
-		skill_area_temp[1] = 0;
-		map_foreachinshootrange(skill_attack_area, src,
-			skill_get_splash(skill_id, skill_lv), splash_target(src),
-			BF_MAGIC, src, src, skill_id, skill_lv, tick, flag, BCT_ENEMY);
+		clif_skill_nodamage(src,bl,skill_id,skill_lv,
+			sc_start(src,bl,type,100,skill_lv,skill_get_time(skill_id,skill_lv)));
 		break;
 
 	case HVAN_EXPLOSION:	//[orn]
@@ -7289,7 +7291,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 	case WZ_ESTIMATION:
 		if( sd == NULL )
 			break;
-		if( dstsd )
+		if( !(skill_get_inf(skill_id)&(INF_SELF_SKILL)) && dstsd )
 		{ // Fail on Players
 			clif_skill_fail(sd,skill_id,USESKILL_FAIL_LEVEL,0);
 			break;
@@ -7297,6 +7299,7 @@ int skill_castend_nodamage_id (struct block_list *src, struct block_list *bl, ui
 
 		clif_skill_nodamage(src, bl, skill_id, skill_lv, 1);
 		clif_skill_estimation(sd, bl);
+		if (sd) sc_start(&sd->bl, src, SC_INTRAVISION, 100, 1, skill_get_time(skill_id,skill_lv));
 		if( skill_id == MER_ESTIMATION )
 			sd = NULL;
 		break;

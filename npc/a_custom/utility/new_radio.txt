@@ -152,6 +152,6 @@ OnPlaylistSelect:
 end;
 OnInit:
 	bindatcmd "radio",strnpcinfo(3)+"::OnRadio";
-	setarray .playlist$,"Japanese:Engish:Filipino";
+	setarray .playlist$,"Japanese:English:Filipino";
 	end;
 }

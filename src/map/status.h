@@ -778,6 +778,7 @@ typedef enum sc_type {
 	SC_GVG_CURSE,
 	SC_GVG_SILENCE,
 	SC_GVG_BLIND,
+	SC_FROSTCOAT,
 
 #ifdef RENEWAL
 	SC_EXTREMITYFIST2, //! NOTE: This SC should be right before SC_MAX, so it doesn't disturb if RENEWAL is disabled
@@ -1727,6 +1728,7 @@ enum si_type {
 	SI_GLOOM_CARD = 988,
 	SI_PHARAOH_CARD = 989,
 	SI_KIEL_CARD = 990,
+	SI_FROSTCOAT = 1200,
 	SI_MAX,
 };
 
