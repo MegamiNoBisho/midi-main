@@ -1109,10 +1109,63 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 						// Enchant Poison Lifesteal by Hanashi
 						case AS_ENCHANTPOISON:
 							{
+							if(pc_checkskill(sd,AS_ENCHANTPOISON)==1){
+							int heal;
+							heal = (sstatus->max_hp * 1/100);
+							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
+							status_heal(src, heal, 0, 0);
+								}
+							if(pc_checkskill(sd,AS_ENCHANTPOISON)==2){
+							int heal;
+							heal = (sstatus->max_hp * 2/100);
+							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
+							status_heal(src, heal, 0, 0);
+								}
+							if(pc_checkskill(sd,AS_ENCHANTPOISON)==3){
+							int heal;
+							heal = (sstatus->max_hp * 3/100);
+							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
+							status_heal(src, heal, 0, 0);
+								}
+							if(pc_checkskill(sd,AS_ENCHANTPOISON)==4){
+							int heal;
+							heal = (sstatus->max_hp * 4/100);
+							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
+							status_heal(src, heal, 0, 0);
+								}
+							if(pc_checkskill(sd,AS_ENCHANTPOISON)==5){
+							int heal;
+							heal = (sstatus->max_hp * 5/100);
+							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
+							status_heal(src, heal, 0, 0);
+								}
+							if(pc_checkskill(sd,AS_ENCHANTPOISON)==6){
+							int heal;
+							heal = (sstatus->max_hp * 6/100);
+							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
+							status_heal(src, heal, 0, 0);
+								}
+							if(pc_checkskill(sd,AS_ENCHANTPOISON)==7){
+							int heal;
+							heal = (sstatus->max_hp * 7/100);
+							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
+							status_heal(src, heal, 0, 0);
+								}
+							if(pc_checkskill(sd,AS_ENCHANTPOISON)==8){
+							int heal;
+							heal = (sstatus->max_hp * 8/100);
+							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
+							status_heal(src, heal, 0, 0);
+								}
+							if(pc_checkskill(sd,AS_ENCHANTPOISON)==9){
+							int heal;
+							heal = (sstatus->max_hp * 9/100);
+							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
+							status_heal(src, heal, 0, 0);
+								}
 							if(pc_checkskill(sd,AS_ENCHANTPOISON)>9){ // Lifesteal will only work if EP is Level 10 [Scylla]
 							int heal;
-							//heal = (sstatus->max_hp * 1/100)*skill_lv; // Commented by Scylla
-							heal = (sstatus->max_hp * 1/100); // Removed skill_lv to fix 0 value lifesteal
+							heal = (sstatus->max_hp * 1/10); // Removed skill_lv to fix 0 value lifesteal
 							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
 							status_heal(src, heal, 0, 0);
 								}
