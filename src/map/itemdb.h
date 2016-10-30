@@ -434,6 +434,7 @@ struct item_data
 		unsigned guid : 1; // This item always be attached with GUID and make it as bound item! [Cydh]
 		unsigned broadcast : 1; ///< Will be broadcasted if someone obtain the item [Cydh]
 		bool bindOnEquip; ///< Set item as bound when equipped
+		unsigned global_stock : 1; ///< Enable global npc_stock on sell or buy [Cydh]
 	} flag;
 	struct {// item stacking limitation
 		unsigned short amount;

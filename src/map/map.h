@@ -979,6 +979,7 @@ extern char vendings_db[32];
 extern char vending_items_db[32];
 extern char market_table[32];
 extern char db_roulette_table[32];
+extern char npc_stock_table[32];
 
 void do_shutdown(void);
 

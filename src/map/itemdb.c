@@ -889,6 +889,22 @@ static bool itemdb_read_flag(char* fields[], int columns, int current) {
 }
 
 /**
+ * Sets item that enable for npc_stock
+ **/
+static bool itemdb_read_npc_stock(char* fields[], int columns, int current) {
+	unsigned short nameid = atoi(fields[0]);
+	struct item_data *id;
+
+	if (!(id = itemdb_exists(nameid))) {
+		ShowError("itemdb_read_npc_stock: Invalid item item with id %hu\n", nameid);
+		return false;
+	}
+
+	id->flag.global_stock = 1;
+	return true;
+}
+
+/**
  * @return: amount of retrieved entries.
  **/
 static int itemdb_combo_split_atoi (char *str, int *val) {
@@ -1700,6 +1716,7 @@ static void itemdb_read(void) {
 		sv_readdb(dbsubpath2, "item_delay.txt",         ',', 2, 3, -1, &itemdb_read_itemdelay, i);
 		sv_readdb(dbsubpath2, "item_buyingstore.txt",   ',', 1, 1, -1, &itemdb_read_buyingstore, i);
 		sv_readdb(dbsubpath2, "item_flag.txt",          ',', 2, 2, -1, &itemdb_read_flag, i);
+		sv_readdb(dbsubpath1, "item_npc_stock.txt",     ',', 1, 1, -1, &itemdb_read_npc_stock, i);
 		aFree(dbsubpath1);
 		aFree(dbsubpath2);
 	}
