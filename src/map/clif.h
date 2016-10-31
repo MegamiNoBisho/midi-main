@@ -988,6 +988,7 @@ enum clif_colors {
 	COLOR_WHITE,
 	COLOR_YELLOW,
 	COLOR_CYAN,
+	COLOR_ORANGE,
 	COLOR_MAX
 };
 unsigned long color_table[COLOR_MAX];

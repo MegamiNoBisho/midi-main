@@ -37,6 +37,11 @@ struct s_npc_buy_list {
 	unsigned short nameid;	///< ID of item will be bought
 };
 
+struct s_npc_item_stock {
+	unsigned short nameid;
+	unsigned int amount;
+};
+
 struct npc_data {
 	struct block_list bl;
 	struct unit_data  ud; //Because they need to be able to move....
@@ -203,6 +208,11 @@ bool npc_shop_discount(enum npc_subtype type, bool discount);
 void npc_market_tosql(const char *exname, struct npc_item_list *list);
 void npc_market_delfromsql_(const char *exname, unsigned short nameid, bool clear);
 #endif
+
+// NPC Stock
+unsigned int npc_stock_check(unsigned short nameid);
+void npc_stock_loadsql(void);
+unsigned int npc_stock_update(unsigned short nameid, int amount, struct npc_data *nd, struct map_session_data *sd);
 
 #ifdef SECURE_NPCTIMEOUT
 	int npc_rr_secure_timeout_timer(int tid, unsigned int tick, int id, intptr_t data);
