@@ -16,24 +16,19 @@
 //= it will go back to first store item
 //= (second store if you are in a specified day) 
 //============================================================
-adventure,179,253,0	script	merchant#one	72,{
-	if(!.resetone)
-		callshop "store#1",1;
-	else
-		callshop "store#"+.resetone,1;
+pa2_in01,17,31,6	script	Payon Headgear#one	72,{
+		callshop "store#"+.payon_merch,1;
 end;
 OnClock0000:
 	if(gettime(4) == 1)//monday
-		.resetone += 1;
-	if(.resetone == 6)
-		.resetone = 1;
+		.payon_merch = rand(1,5);
 end;
  }
 //============================================================
 //= list of store item shop 1
 //============================================================
 
--	shop	store#1	-1,512:10
+-	itemshop	store#1	-1,7539,20437:1,20396:1,20392:1,20378:1,20348:1,20304:1,20284:1,20270:1,20269:1,20265:1,20262:1,20238:1,20151:1
 -	shop	store#2	-1,513:20
 -	shop	store#3	-1,514:30
 -	shop	store#4	-1,515:40
