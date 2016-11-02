@@ -1,0 +1,49 @@
+// -------------------------------------------------------
+//   Halloween Colection - MIDI City Ragnarok Online
+// -------------------------------------------------------
+// Scatter the NPCs around and let players find them
+// This is a finders-keepers style of collection event
+// So only the first person to find them wins
+// -------------------------------------------------------
+// Author: Cyan Hijirikawa
+// -------------------------------------------------------
+// Version
+// 1.0 - Initial Release
+// -------------------------------------------------------
+-	script	HalloweenCollection	-1,{
+	.@map$ = strnpcinfo(4);
+	.@owner$ = strcharinfo(0);
+	mes "[ Pumpkin Head ]";
+	for(.@i = 0; .@i < .location; .@i++){
+		if(.pumpkinhead$[.@i] == .@map$){
+			if(.pumpkinowner$[.@i] == .@map$){
+				.pumpkinowner$[.@i] = .@owner$;
+				break;
+			}
+				mes .pumpkinowner$[.@i]+" has already claimed me.";
+				close;
+		}
+	}
+	.@rand = rand(0,.rand);
+	mes "Congratulations "+strcharinfo(0);
+	mes "You found me!";
+	getitem .reward_items[.@rand],.reward_count[.@rand];
+	close;
+	
+OnInterIfInitOnce:
+	setarray .pumpkinhead$,"prontera","payon_mem","xmas","geffen","izlude","morocc","alberta";
+	setarray .pumpkinowner$,"prontera","payon_mem","xmas","geffen","izlude","morocc","alberta";
+	setarray .reward_items,501,502,503,504,505;
+	setarray .reward_count,1,2,3,4,5;
+	.location = getarraysize(.pumpkinhead$);
+	.rand = getarraysize(.reward_items);
+end;
+}
+
+morocc,160,86,5	duplicate(HalloweenCollection)	Pumkin Head#moc	123
+xmas,147,134,5	duplicate(HalloweenCollection)	Pumpkin Head#xmas	123
+geffen,119,59,5	duplicate(HalloweenCollection)	Pumpkin Head#gef	123
+payon_mem,90,110,5	duplicate(HalloweenCollection)	Pumpkin Head#pay	123
+prontera,156,191,5	duplicate(HalloweenCollection)	Pumpkin Head#pront	123
+alberta,192,147,5	duplicate(HalloweenCollection)	Pumpkin Head#alb	123
+alberta,128,114,5	duplicate(HalloweenCollection)	Pumpkin Head#izl	123

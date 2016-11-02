@@ -1,4 +1,4 @@
-adventure,176,236,5	script	Gachapon Machine#main	562,{
+payon_mem,114,102,5	script	Gachapon Machine#main	562,{
 
 	mes "[ Gachapon Machine ]";
 	mes "Reward list for the month of ^ff0000"+.month$[gettime(6)]+"^000000";
@@ -76,52 +76,52 @@ OnInit:
 	//reward depending on month
 	switch(gettime(6)){
 		case 1:
-			setarray .headgearlist,502,503,504,505;
-			setarray .specialreward,510,511,512,513;
+			setarray .headgearlist,20405,20117,19739,20507;
+			setarray .specialreward,7619,7620,12209,12211;
 			break;
 		case 2:
-			setarray .headgearlist,502,503,504,505;
-			setarray .specialreward,510,511,512,513;
+			setarray .headgearlist,20239,20185,20255,20171;
+			setarray .specialreward,7619,7620,12209,12211;
 			break;
 		case 3:
-			setarray .headgearlist,502,503,504,505;
-			setarray .specialreward,510,511,512,513;
+			setarray .headgearlist,20085,20048,20191,20282;
+			setarray .specialreward,7619,7620,12209,12211;
 			break;
 		case 4:
-			setarray .headgearlist,502,503,504,505;
-			setarray .specialreward,510,511,512,513;
+			setarray .headgearlist,19595,20266,20112,20324;
+			setarray .specialreward,7619,7620,12209,12211;
 			break;
 		case 5:
-			setarray .headgearlist,502,503,504,505;
-			setarray .specialreward,510,511,512,513;
+			setarray .headgearlist,19761,20243,20046,20763;
+			setarray .specialreward,7619,7620,12209,12211;
 			break;
 		case 6:
-			setarray .headgearlist,502,503,504,505;
-			setarray .specialreward,510,511,512,513;
+			setarray .headgearlist,20325,20317,20113,20115;
+			setarray .specialreward,7619,7620,12209,12211;
 			break;
 		case 7:
-			setarray .headgearlist,502,503,504,505;
-			setarray .specialreward,510,511,512,513;
+			setarray .headgearlist,20448,20329,20319,19968;
+			setarray .specialreward,7619,7620,12209,12211;
 			break;
 		case 8:
-			setarray .headgearlist,502,503,504,505;
-			setarray .specialreward,510,511,512,513;
+			setarray .headgearlist,20440,20335,20302,20277;
+			setarray .specialreward,7619,7620,12209,12211;
 			break;
 		case 9:
-			setarray .headgearlist,502,503,504,505;
-			setarray .specialreward,510,511,512,513;
+			setarray .headgearlist,20372,20200,19860,20268;
+			setarray .specialreward,7619,7620,12209,12211;
 			break;
 		case 10:
-			setarray .headgearlist,502,503,504,505;
-			setarray .specialreward,510,511,512,513;
+			setarray .headgearlist,20130,20398,20375,19917;
+			setarray .specialreward,7619,7620,12209,12211;
 			break;
 		case 11:
-			setarray .headgearlist,502,503,504,505;
-			setarray .specialreward,510,511,512,513;
+			setarray .headgearlist,19661,20032,20232,20299;
+			setarray .specialreward,7619,7620,12209,12211;
 			break;
 		case 12:
-			setarray .headgearlist,502,503,504,505;
-			setarray .specialreward,510,511,512,513;
+			setarray .headgearlist,20155,20231,19702,19685;
+			setarray .specialreward,7619,7620,12209,12211;
 			break;
 	}
 		.headgear_reward = getarraysize(.headgearlist);

@@ -1917,6 +1917,21 @@ void clif_buylist(struct map_session_data *sd, struct npc_data *nd)
 	nullpo_retv(sd);
 	nullpo_retv(nd);
 
+	if (!nd->u.shop.ignoreStock) {
+		int j = 0;
+		char msg[CHAT_SIZE_MAX];
+		sprintf(msg, "This NPC is using global stock.");
+		clif_disp_onlyself(sd, msg, strlen(msg));
+		for (i = 0; i < nd->u.shop.count; i++) {
+			struct item_data* id = itemdb_exists(nd->u.shop.shop_item[i].nameid);
+			if (!id || !id->flag.global_stock)
+				continue;
+			memset(msg, '\0', sizeof(msg));
+			sprintf(msg, "%d. %s : %d", ++j, id->jname, npc_stock_check(id->nameid));
+			clif_disp_onlyself(sd, msg, strlen(msg));
+		}
+	}
+
 	fd = sd->fd;
 	WFIFOHEAD(fd, 4 + nd->u.shop.count * 11);
 	WFIFOW(fd,0) = 0xc6;
@@ -15677,6 +15692,21 @@ void clif_cashshop_show(struct map_session_data *sd, struct npc_data *nd)
 
 	npc_shop_currency_type(sd, nd, cost, true);
 
+	if (!nd->u.shop.ignoreStock) {
+		int j = 0;
+		char msg[CHAT_SIZE_MAX];
+		sprintf(msg, "This NPC is using global stock.");
+		clif_disp_onlyself(sd, msg, strlen(msg));
+		for (i = 0; i < nd->u.shop.count; i++) {
+			struct item_data* id = itemdb_exists(nd->u.shop.shop_item[i].nameid);
+			if (!id || !id->flag.global_stock)
+				continue;
+			memset(msg, '\0', sizeof(msg));
+			sprintf(msg, "%d. %s : %d", ++j, id->jname, npc_stock_check(id->nameid));
+			clif_disp_onlyself(sd, msg, strlen(msg));
+		}
+	}
+
 	fd = sd->fd;
 	sd->npc_shopid = nd->bl.id;
 	WFIFOHEAD(fd,offset+nd->u.shop.count*11);
@@ -19750,6 +19780,7 @@ void do_init_clif(void) {
 		"0xFFFFFF",
 		"0xFFFF00",
 		"0x00FFFF",
+		"0xFF6A00", // COLOR_ORANGE
 	};
 	int i;
 	/**

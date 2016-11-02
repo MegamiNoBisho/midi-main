@@ -54,6 +54,8 @@ static void npc_market_fromsql(void);
 #define npc_market_clearfromsql(exname) (npc_market_delfromsql_((exname), 0, true))
 #endif
 
+static DBMap *NPCStockDB; /// Global stock items. nameid -> struct s_npc_item_stock
+
 /// Returns a new npc id that isn't being used in id_db.
 /// Fatal error if nothing is available.
 int npc_get_new_npc_id(void) {
@@ -1384,10 +1386,11 @@ int npc_cashshop_buylist(struct map_session_data *sd, int points, int count, uns
 	// Validating Process ----------------------------------------------------
 	for( i = 0; i < count; i++ )
 	{
+		struct item_data *id = NULL;
 		nameid = item_list[i*2+1];
 		amount = item_list[i*2+0];
 
-		if( !itemdb_exists(nameid) || amount <= 0 )
+		if( !(id = itemdb_exists(nameid)) || amount <= 0 )
 			return ERROR_TYPE_ITEM_ID;
 
 		ARR_FIND(0,nd->u.shop.count,j,nd->u.shop.shop_item[j].nameid == nameid || itemdb_viewid(nd->u.shop.shop_item[j].nameid) == nameid);
@@ -1409,6 +1412,24 @@ int npc_cashshop_buylist(struct map_session_data *sd, int points, int count, uns
 				break;
 			case CHKADDITEM_OVERAMOUNT:
 				return ERROR_TYPE_INVENTORY_WEIGHT;
+		}
+
+		if (!nd->u.shop.ignoreStock && id->flag.global_stock) {
+			unsigned int stock = npc_stock_check(nameid);
+			if (stock < amount) {
+				char msg[CHAT_SIZE_MAX];
+				if (!stock) {
+					sprintf(msg, "Item '%s' is out of stock.", itemdb_jname(nameid));
+					clif_colormes(sd->fd, color_table[COLOR_RED], msg);
+					clif_disp_overhead(&nd->bl, msg);
+					return ERROR_TYPE_ITEM_ID;
+				}
+				else {
+					sprintf(msg, "Item '%s' is only available: %d.", itemdb_jname(nameid), stock);
+					clif_colormes(sd->fd, color_table[COLOR_ORANGE], msg);
+					amount = item_list[i*2+0] = stock;
+				}
+			}
 		}
 
 		vt += nd->u.shop.shop_item[j].value * amount;
@@ -1469,8 +1490,12 @@ int npc_cashshop_buylist(struct map_session_data *sd, int points, int count, uns
 
 	// Delivery Process ----------------------------------------------------
 	for( i = 0; i < count; i++ ) {
+		struct item_data *id = NULL;
 		nameid = item_list[i*2+1];
 		amount = item_list[i*2+0];
+
+		if (!nd->u.shop.ignoreStock && (id = itemdb_exists(nameid)) && id->flag.global_stock)
+			npc_stock_update(nameid, -amount, nd, sd);
 
 		if( !pet_create_egg(sd,nameid) ) {
 			struct item item_tmp;
@@ -1709,6 +1734,7 @@ uint8 npc_buylist(struct map_session_data* sd, uint16 n, struct s_npc_buy_list *
 	for( i = 0; i < n; ++i ) {
 		unsigned short nameid, amount;
 		int value;
+		struct item_data *id = NULL;
 
 		// find this entry in the shop's sell list
 		ARR_FIND( 0, nd->u.shop.count, j,
@@ -1731,8 +1757,26 @@ uint8 npc_buylist(struct map_session_data* sd, uint16 n, struct s_npc_buy_list *
 		nameid = item_list[i].nameid = shop[j].nameid; //item_avail replacement
 		value = shop[j].value;
 
-		if( !itemdb_exists(nameid) )
+		if( !(id = itemdb_exists(nameid)) )
 			return 3; // item no longer in itemdb
+
+		if (!nd->u.shop.ignoreStock && id->flag.global_stock) {
+			unsigned int stock = npc_stock_check(nameid);
+			if (stock < amount) {
+				char msg[CHAT_SIZE_MAX];
+				if (!stock) {
+					sprintf(msg, "Item '%s' is out of stock.", itemdb_jname(nameid));
+					clif_colormes(sd->fd, color_table[COLOR_RED], msg);
+					clif_disp_overhead(&nd->bl, msg);
+					return 3;
+				}
+				else {
+					sprintf(msg, "Item '%s' is only available: %d.", itemdb_jname(nameid), stock);
+					clif_colormes(sd->fd, color_table[COLOR_ORANGE], msg);
+					amount = item_list[i].qty = stock;
+				}
+			}
+		}
 
 		if( !itemdb_isstackable(nameid) && amount > 1 ) { //Exploit? You can't buy more than 1 of equipment types o.O
 			ShowWarning("Player %s (%d:%d) sent a hexed packet trying to buy %d of nonstackable item %hu!\n",
@@ -1779,6 +1823,7 @@ uint8 npc_buylist(struct map_session_data* sd, uint16 n, struct s_npc_buy_list *
 	for( i = 0; i < n; ++i ) {
 		unsigned short nameid = item_list[i].nameid;
 		unsigned short amount = item_list[i].qty;
+		struct item_data *id = itemdb_exists(nameid);
 
 #if PACKETVER >= 20131223
 		if (nd->subtype == NPCTYPE_MARKETSHOP) {
@@ -1788,7 +1833,10 @@ uint8 npc_buylist(struct map_session_data* sd, uint16 n, struct s_npc_buy_list *
 			shop[j].qty -= amount;
 			npc_market_tosql(nd->exname, &shop[j]);
 		}
+		else
 #endif
+		if (!nd->u.shop.ignoreStock && id && id->flag.global_stock)
+			npc_stock_update(nameid, -amount, nd, sd);
 
 		if (itemdb_type(nameid) == IT_PETEGG)
 			pet_create_egg(sd, nameid);
@@ -1954,6 +2002,14 @@ uint8 npc_selllist(struct map_session_data* sd, int n, unsigned short *item_list
 			{
 				intif_delete_petdata(MakeDWord(sd->status.inventory[idx].card[1], sd->status.inventory[idx].card[2]));
 			}
+		}
+
+		if (!nd->u.shop.ignoreStock && sd->inventory_data[idx]->flag.global_stock) {
+			unsigned int stock = npc_stock_update(sd->status.inventory[idx].nameid, amount, nd, sd);
+			char msg[CHAT_SIZE_MAX];
+			sprintf(msg, "Stock of item '%s' is increased to '%d'.", itemdb_jname(sd->status.inventory[idx].nameid), stock);
+			clif_colormes(sd->fd, color_table[COLOR_CYAN], msg);
+			clif_disp_overhead(&nd->bl, msg);
 		}
 
 		pc_delitem(sd, idx, amount, 0, 6, LOG_TYPE_NPC);
@@ -2507,7 +2563,7 @@ static const char* npc_parse_warp(char* w1, char* w2, char* w3, char* w4, const 
 static const char* npc_parse_shop(char* w1, char* w2, char* w3, char* w4, const char* start, const char* buffer, const char* filepath)
 {
 	char *p, point_str[32];
-	int m, is_discount = 0;
+	int m, is_discount = 0, ignoreStock = 0;
 	uint16 dir;
 	short x, y;
 	unsigned short nameid = 0;
@@ -2552,7 +2608,7 @@ static const char* npc_parse_shop(char* w1, char* w2, char* w3, char* w4, const 
 
 	switch(type) {
 		case NPCTYPE_ITEMSHOP: {
-			if (sscanf(p,",%5hu:%11d,",&nameid,&is_discount) < 1) {
+			if (sscanf(p,",%5hu:%11d:%1d,",&nameid,&is_discount,&ignoreStock) < 1 && sscanf(p,",%5hu:%11d,",&nameid,&is_discount) < 1) {
 				ShowError("npc_parse_shop: Invalid item cost definition in file '%s', line '%d'. Ignoring the rest of the line...\n * w1=%s\n * w2=%s\n * w3=%s\n * w4=%s\n", filepath, strline(buffer,start-buffer), w1, w2, w3, w4);
 				return strchr(start,'\n'); // skip and continue
 			}
@@ -2564,7 +2620,7 @@ static const char* npc_parse_shop(char* w1, char* w2, char* w3, char* w4, const 
 			break;
 		}
 		case NPCTYPE_POINTSHOP: {
-			if (sscanf(p, ",%32[^,:]:%11d,",point_str,&is_discount) < 1) {
+			if (sscanf(p, ",%32[^,:]:%11d:%1d,",point_str,&is_discount,&ignoreStock) < 1 && sscanf(p, ",%32[^,:]:%11d,",point_str,&is_discount) < 1) {
 				ShowError("npc_parse_shop: Invalid item cost definition in file '%s', line '%d'. Ignoring the rest of the line...\n * w1=%s\n * w2=%s\n * w3=%s\n * w4=%s\n", filepath, strline(buffer,start-buffer), w1, w2, w3, w4);
 				return strchr(start,'\n'); // skip and continue
 			}
@@ -2589,10 +2645,15 @@ static const char* npc_parse_shop(char* w1, char* w2, char* w3, char* w4, const 
 			return strchr(start, '\n'); // skip and continue
 #else
 			is_discount = 0;
+			ignoreStock = true;
 			break;
 #endif
 		default:
 			is_discount = 1;
+			if (strncmpi(p+1,"1,",2) == 0) {
+				ignoreStock = 1;
+				p = strchr(p+1,',');
+			}
 			break;
 	}
 	
@@ -2699,6 +2760,7 @@ static const char* npc_parse_shop(char* w1, char* w2, char* w3, char* w4, const 
 	npc_parsename(nd, w3, start, buffer, filepath);
 	nd->class_ = m == -1 ? -1 : npc_parseview(w4, start, buffer, filepath);
 	nd->speed = 200;
+	nd->u.shop.ignoreStock = ignoreStock;
 
 	++npc_shop;
 	nd->bl.type = BL_NPC;
@@ -4544,6 +4606,128 @@ void do_clear_npc(void) {
 	db_clear(ev_db);
 }
 
+/**
+ * Free stock item from memory
+ **/
+int npc_stock_free(DBKey key, DBData *data, va_list ap) {
+	struct s_npc_item_stock *p = (struct s_npc_item_stock *)db_data2ptr(data);
+	if (p)
+		aFree(p);
+	return 1;
+}
+
+/**
+ * Get stock of an item
+ * @param name_id
+ * @return Amount of stock
+ **/
+unsigned int npc_stock_check(unsigned short nameid) {
+	struct s_npc_item_stock *p = (struct s_npc_item_stock *)uidb_get(NPCStockDB, nameid);
+	return p ? p->amount : 0;
+}
+
+/**
+ * Load item stocks from table
+ **/
+void npc_stock_loadsql(void) {
+	SqlStmt *stmt;
+	StringBuf buf;
+	struct s_npc_item_stock stock;
+
+	stmt = SqlStmt_Malloc(mmysql_handle);
+
+	StringBuf_Init(&buf);
+	StringBuf_Printf(&buf, "SELECT `nameid`, `amount` FROM `%s` ORDER BY `nameid`", npc_stock_table);
+	if (SQL_ERROR == SqlStmt_PrepareStr(stmt, StringBuf_Value(&buf)) || SQL_ERROR == SqlStmt_Execute(stmt)) {
+		SqlStmt_ShowDebug(stmt);
+		SqlStmt_Free(stmt);
+		StringBuf_Destroy(&buf);
+		return;
+	}
+
+	SqlStmt_BindColumn(stmt, 0, SQLDT_USHORT, &stock.nameid, 0, NULL, NULL);
+	SqlStmt_BindColumn(stmt, 1, SQLDT_UINT, &stock.amount, 0, NULL, NULL);
+
+	while (SQL_SUCCESS == SqlStmt_NextRow(stmt)) {
+		struct s_npc_item_stock *p;
+		CREATE(p, struct s_npc_item_stock, 1);
+		p->nameid = stock.nameid;
+		p->amount = stock.amount;
+		uidb_put(NPCStockDB, p->nameid, p);
+		ShowInfo("Item "CL_WHITE"%s"CL_RESET" (%d), stock: "CL_WHITE"%d"CL_RESET"\n", itemdb_name(p->nameid), p->nameid, p->amount);
+	}
+	SqlStmt_Free(stmt);
+	StringBuf_Destroy(&buf);
+
+	ShowStatus("Done loading '"CL_WHITE"%d"CL_RESET"' entries for NPC Stock from '"CL_WHITE"%s"CL_RESET"' table.\n", db_size(NPCStockDB), npc_stock_table);
+}
+
+/**
+ * Update stock of item to memory and table
+ * @param nameid Item ID
+ * @param amount Item changed (added or removed)
+ * @param nd NPC Data that trigger this event
+ * @param sd Player Data that trigger this event
+ * @return Amount of item's stock after this update
+ **/
+unsigned int npc_stock_update(unsigned short nameid, int amount, struct npc_data *nd, struct map_session_data *sd) {
+	SqlStmt *stmt;
+	StringBuf buf;
+	struct s_npc_item_stock *p = (struct s_npc_item_stock *)uidb_get(NPCStockDB, nameid);
+	int prev_amount = 0;
+
+	if (p) {
+		prev_amount = p->amount;
+		if ((int)p->amount + amount < 0) {
+			// This underflow check to clarify when maybe more than 1 player bought item in same time
+			StringBuf buf;
+			StringBuf_Init(&buf);
+			StringBuf_Printf(&buf, "[NPC Stock] Item '%s' (%d) was bought with value more than its stock! %d > %d", itemdb_name(nameid), nameid, amount, p->amount);
+			if (nd)
+				StringBuf_Printf(&buf, " NPC: '%s'('%s'). At '%s' (%d,%d).", nd->name, nd->exname, map[nd->bl.m].name, nd->bl.x, nd->bl.y);
+			if (sd) {
+				StringBuf_Printf(&buf, " Player: '%s' AID:%d/CID:%d.", sd->status.name, sd->status.account_id, sd->status.char_id);
+				if (!nd)
+					StringBuf_Printf(&buf, " At '%s (%d,%d).", map[sd->bl.m], sd->bl.x, sd->bl.y);
+			}
+			ShowWarning(StringBuf_Value(&buf));
+			StringBuf_Destroy(&buf);
+			amount = p->amount;
+		}
+		if (p->amount + amount > UINT32_MAX) {
+			amount = 0;
+			ShowWarning("[NPC Stock] Reached max stock of item '%s' (%d)!", itemdb_name(nameid), nameid);
+		}
+		p->amount += amount;
+	}
+	else {
+		CREATE(p, struct s_npc_item_stock, 1);
+		p->nameid = nameid;
+		p->amount = amount;
+		uidb_put(NPCStockDB, p->nameid, p);
+	}
+
+	if (p->amount == prev_amount)
+		return p->amount;
+	stmt = SqlStmt_Malloc(mmysql_handle);
+
+	StringBuf_Init(&buf);
+	StringBuf_Printf(&buf, "INSERT INTO `%s`(`nameid`,`amount`) VALUES('%d','%d') ON DUPLICATE KEY UPDATE `amount` = `amount`+'%d'",
+		npc_stock_table, nameid, amount, amount);
+
+	if (SQL_SUCCESS != SqlStmt_PrepareStr(stmt, StringBuf_Value(&buf)) || SQL_SUCCESS != SqlStmt_Execute(stmt)) {
+		SqlStmt_ShowDebug(stmt);
+		SqlStmt_Free(stmt);
+		StringBuf_Destroy(&buf);
+		return p->amount;
+	}
+	SqlStmt_Free(stmt);
+	StringBuf_Destroy(&buf);
+
+	ShowInfo("NPC Stock: Item "CL_WHITE"%s"CL_RESET" (%d) updated from '%d' to "CL_WHITE"%d"CL_RESET".\n", itemdb_name(nameid), nameid, prev_amount, p->amount);
+	return p->amount;
+}
+
 /*==========================================
  * Destructor
  *------------------------------------------*/
@@ -4557,6 +4741,7 @@ void do_final_npc(void) {
 #endif
 	ers_destroy(timer_event_ers);
 	npc_clearsrcfile();
+	NPCStockDB->destroy(NPCStockDB, npc_stock_free);
 }
 
 static void npc_debug_warps_sub(struct npc_data* nd)
@@ -4665,4 +4850,6 @@ void do_init_npc(void){
 	fake_nd->u.scr.timerid = INVALID_TIMER;
 	map_addiddb(&fake_nd->bl);
 	// End of initialization
+	NPCStockDB = uidb_alloc(DB_OPT_BASE);
+	npc_stock_loadsql();
 }

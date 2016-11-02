@@ -71,6 +71,7 @@ char vendings_db[32] = "vendings";
 char vending_items_db[32] = "vending_items";
 char market_table[32] = "market";
 char db_roulette_table[32] = "db_roulette";
+char npc_stock_table[32] = "npc_stock";
 
 // log database
 char log_db_ip[32] = "127.0.0.1";
@@ -3997,6 +3998,8 @@ int inter_config_read(char *cfgName)
 			strcpy(db_roulette_table, w2);
 		else if (strcmpi(w1, "market_table") == 0)
 			strcpy(market_table, w2);
+		else if (strcmpi(w1, "npc_stock_table") == 0)
+			strcpy(npc_stock_table, w2);
 		else
 		//Map Server SQL DB
 		if(strcmpi(w1,"map_server_ip")==0)
