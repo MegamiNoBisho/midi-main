@@ -11,6 +11,7 @@
 //===== Additional Comments: =================================
 //= doesnt break weapons or armor
 //= added manual and automatic transmission
+//= equalled per next level of upgrade in item required 
 //============================================================
 adventure,167,239,8	script	Wayland	63,{
 callfunc "saferefine","Wayland",0;
@@ -98,7 +99,8 @@ function	script	saferefine	{
 //=============================================================	
 		mes "["+ .@npc_name$ +"]";
 		mes "To refine this I need";
-		mes "one ^BB00CC"+getitemname(.@material)+"^000000 ,^BB00CC"+getitemname(7620)+"^000000 and ^BB00CC"+getitemname(7619)+"^000000";
+		mes "one ^BB00CC"+getitemname(.@material)+"^000000 ,^BB00CC"+getitemname(7620)+"^000000,^BB00CC"+getitemname(7619)+"^000000";
+		mes "and times the next level of upgrade of the ^BB00CC" +getitemname(.@equipped)+"^000000";
 		mes "Do you really wish to continue?";
 		next;	
 		if(select("Yes:No") == 2){
@@ -137,22 +139,6 @@ function	script	saferefine	{
 			mes "So...How many times would you like me to refine your item?";
 			next;
 			input .@refinecnt;
-//=============================================================	
-		if ((countitem(.@material)) < .@refinecnt){
-			mes "["+ .@npc_name$ +"]";
-			mes "the required material is insufficient";
-			close;
-		}
-		if ((countitem(.@firstmaterial)) < .@refinecnt){
-			mes "["+ .@npc_name$ +"]";
-			mes "the required material is insufficient";
-			close;
-		}	
-		if ((countitem(.@secondmaterial))< .@refinecnt){
-			mes "["+ .@npc_name$ +"]";
-			mes "the required material is insufficient";
-			close;
-		}	
 		while(.@refinecnt){
 //=============================================================
 		//Check to see if the items is already +10
@@ -162,7 +148,23 @@ function	script	saferefine	{
 				mes "any more. This is as";
 				mes "refined as it gets!";
 				close;
-												}
+			}
+//=============================================================												}
+			if((getequiprefinerycnt(.@part)+1)>(countitem(.@material))){
+				mes "["+ .@npc_name$ +"]";
+				mes "insufficient ^BB00CC"+getitemname(.@material)+"^000000";
+				close;
+			}
+			if((getequiprefinerycnt(.@part)+1)>(countitem(.@firstmaterial))){
+				mes "["+ .@npc_name$ +"]";
+				mes "insufficient ^BB00CC"+getitemname(7620)+"^000000";
+				close;
+			}
+			if((getequiprefinerycnt(.@part)+1)>(countitem(.@secondmaterial))){
+				mes "["+ .@npc_name$ +"]";
+				mes "insufficient ^BB00CC"+getitemname(7619)+"^000000";
+				close;
+			}
 //=============================================================
 			if (getequipisequiped(.@part) == 0) {
 				mes "["+ .@npc_name$ +"]";
@@ -180,15 +182,15 @@ function	script	saferefine	{
 //=============================================================
 				mes "Clang, clang!!!";
 			if(getequippercentrefinery(.@part) <= rand(100)) {
-				delitem .@material,1;
-				delitem .@firstmaterial,1;
-				delitem .@secondmaterial,1;
+				delitem .@material,(getequiprefinerycnt(.@part)+1);
+				delitem .@firstmaterial,(getequiprefinerycnt(.@part)+1);
+				delitem .@secondmaterial,(getequiprefinerycnt(.@part)+1);
 				downrefitem .@part;
 				goto Refcent;
 															}
-				delitem .@material,1;
-				delitem .@firstmaterial,1;
-				delitem .@secondmaterial,1;
+				delitem .@material,(getequiprefinerycnt(.@part)+1);
+				delitem .@firstmaterial,(getequiprefinerycnt(.@part)+1);
+				delitem .@secondmaterial,(getequiprefinerycnt(.@part)+1);
 				successrefitem .@part;
 				emotion e_no1;
 					Refcent:
@@ -218,21 +220,21 @@ function	script	saferefine	{
 				close;
 												}
 //=============================================================													
-			if((countitem(.@material))<1){
-			mes "["+ .@npc_name$ +"]";
-			mes "the required material is insufficient";
-			close;
-									}
-		if((countitem(.@firstmaterial))<1){
-			mes "["+ .@npc_name$ +"]";
-			mes "the required material is insufficient";
-			close;
-									}
-		if((countitem(.@secondmaterial))<1){
-			mes "["+ .@npc_name$ +"]";
-			mes "the required material is insufficient";
-			close;
-									}
+			if((getequiprefinerycnt(.@part)+1)>(countitem(.@material))){
+				mes "["+ .@npc_name$ +"]";
+				mes "insufficient ^BB00CC"+getitemname(.@material)+"^000000";
+				close;
+			}
+			if((getequiprefinerycnt(.@part)+1)>(countitem(.@firstmaterial))){
+				mes "["+ .@npc_name$ +"]";
+				mes "insufficient ^BB00CC"+getitemname(7620)+"^000000";
+				close;
+			}
+			if((getequiprefinerycnt(.@part)+1)>(countitem(.@secondmaterial))){
+				mes "["+ .@npc_name$ +"]";
+				mes "insufficient ^BB00CC"+getitemname(7619)+"^000000";
+				close;
+			}
 //=============================================================	
 			if (getequipisequiped(.@part) == 0) {
 				mes "["+ .@npc_name$ +"]";
@@ -249,9 +251,9 @@ function	script	saferefine	{
 //=============================================================													
 				mes "Clang, clang!!!";
 			if(getequippercentrefinery(.@part) <= rand(100)) {
-				delitem .@material,1;
-				delitem .@firstmaterial,1;
-				delitem .@secondmaterial,1;
+				delitem .@material,(getequiprefinerycnt(.@part)+1);
+				delitem .@firstmaterial,(getequiprefinerycnt(.@part)+1);
+				delitem .@secondmaterial,(getequiprefinerycnt(.@part)+1);
 				downrefitem .@part;
 				mes "["+ .@npc_name$ +"]";
 				mes "Again?";
@@ -263,9 +265,9 @@ function	script	saferefine	{
 										}
 				goto Again;
 															}
-				delitem .@material,1;
-				delitem .@firstmaterial,1;
-				delitem .@secondmaterial,1;
+				delitem .@material,(getequiprefinerycnt(.@part)+1);
+				delitem .@firstmaterial,(getequiprefinerycnt(.@part)+1);
+				delitem .@secondmaterial,(getequiprefinerycnt(.@part)+1);
 				successrefitem .@part;
 				emotion e_no1;
 				mes "["+ .@npc_name$ +"]";
