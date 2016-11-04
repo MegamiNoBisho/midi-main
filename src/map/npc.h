@@ -83,6 +83,7 @@ struct npc_data {
 			unsigned short itemshop_nameid; // Item Shop cost item ID
 			char pointshop_str[32]; // Point Shop cost variable name
 			bool discount;
+			bool ignoreStock; // 0:Enable global stock
 		} shop;
 		struct {
 			short xs,ys; // OnTouch area radius
