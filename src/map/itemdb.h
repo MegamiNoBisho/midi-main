@@ -447,6 +447,10 @@ struct item_data
 		unsigned int flag;
 		unsigned short override;
 	} item_usage;
+	struct {
+		unsigned short *nameid;
+		unsigned char count;
+	} add_stock_for;
 	short gm_lv_trade_override;	//GM-level to override trade_restriction
 	/* bugreport:309 */
 	struct item_combo **combos;
