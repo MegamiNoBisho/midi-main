@@ -18,7 +18,7 @@ function	script	epoch_time	{
 1@ice	mapflag	nocommand	10
 1@ice	mapflag	nosave
 
-ice_dun03,150,133,4	script	Frozen Statue::instance_ice_palace	4_M_FROZEN,{
+payon_mem,113,98,4	script	Frozen Statue::instance_ice_palace	10191,{
 	doevent "md_ice_palace_enter::OnTalk";
 }
 
@@ -485,7 +485,7 @@ ice_dun03,150,133,4	script	Frozen Statue::instance_ice_palace	4_M_FROZEN,{
 		.@map$ = strnpcinfo(4);
 		.@npc_name$ = strnpcinfo(3);
 		
-		mapannounce .@map$,"<Ice Palace> Ktullanux turned into its Final Form and splitted into 3 !!",bc_map;
+		mapannounce .@map$,"<Ice Palace> Ktullanux turned into its Final Form and splitts into 3 !!",bc_map;
 		'ktullanux_form = 3;
 		'ktullanux_form_timer = 60;
 		monster .@map$,187,125,"--ja--",1779,1,.@npc_name$+"::OnKilled5",Size_Small;
@@ -494,7 +494,6 @@ ice_dun03,150,133,4	script	Frozen Statue::instance_ice_palace	4_M_FROZEN,{
 		initnpctimer;
 		end;
 	
-		
 	OnTimer5000:
 		'ktullanux_form_timer -= 5;
 		if ( 'ktullanux_form_timer <= 0 ) {
@@ -506,7 +505,7 @@ ice_dun03,150,133,4	script	Frozen Statue::instance_ice_palace	4_M_FROZEN,{
 					if ( mobcount( .@map$,.@npc_name$+"::OnStartFormEnd1" ) ) {
 						killmonster .@map$,.@npc_name$+"::OnStartFormEnd1";
 						donpcevent .@npc_name$+"::OnStart5";
-						mapannounce .@map$,"<Ice Palace> Ktullanux revived using the life force of remaining guardians!!",bc_map;
+						mapannounce .@map$,"<Ice Palace> Ktullanux revived using the life force of the remaining guardians!!",bc_map;
 					}
 					else {
 						donpcevent .@npc_name$+"::OnStartForm2";
