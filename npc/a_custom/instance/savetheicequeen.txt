@@ -1,0 +1,578 @@
+/*	instance_db.txt
+
+101,Ice Palace,3600,300,1@ice,187,68
+
+*/
+
+
+function	script	epoch_time	{
+	.@time = getarg(0);
+	.@hour = ( .@time / 3600 );
+	.@min = ( .@time % 3600 ) / 60 ;
+	.@sec = ( ( .@time % 3600 ) % 60 ) % 60;
+	
+	return sprintf( "%02d:%02d:%02d",.@hour,.@min,.@sec );
+}
+
+// instance
+1@ice	mapflag	nocommand	10
+1@ice	mapflag	nosave
+
+payon_mem,113,98,4	script	Frozen Statue::instance_ice_palace	10191,{
+	doevent "md_ice_palace_enter::OnTalk";
+}
+
+
+-	script	md_ice_palace_enter	-1,{
+
+	OnTalk:
+		.@guild_id = getcharid(2);
+		.@is_leader = ( getcharid(0) == getguildmasterid(.@guild_id) );
+		.@has_instance = ( instance_mapname( .map$ ) != "" );
+		
+		mes "^0055FF[ Grey Fullbuster ]^000000";
+		mes "Inside lies the ruins of the Ice Castle.";
+		mes "It is rumored that the Ice Queen is still trapped inside.";
+		mes "Our guild ^ff0000Fairy Tail^000000 has already saved her once...";
+		mes "Do you think your guild can do it?";
+		next;
+		switch( select( 
+			( .@guild_id && .@is_leader && !.@has_instance ) ? "Enter Ice Palace" : "",
+			( .@guild_id && .@is_leader && .@has_instance ) ? "" : "", // Enter Memorial Dungeon
+			( .@guild_id && .@is_leader && .@has_instance ) ? "Give Up" : "",
+			"Leave"
+		)){
+			case 1:
+				// guild member count
+				setarray .@guild_member,1,12;
+				
+				getguildmember .@guild_id,1;
+				getguildmember .@guild_id,2;
+			
+				.@origin = getcharid(3);
+				.@time = gettimetick(2);
+				.@current_map$ = strcharinfo(3);
+				for ( .@i = 0; .@i < $@guildmembercount; .@i++ )
+					if ( isloggedin( $@guildmemberaid[.@i],$@guildmembercid[.@i] ) ) 
+						if ( attachrid( $@guildmemberaid[.@i] ) )
+							if ( strcharinfo(3) == .@current_map$ ) {
+								.@member_count++;
+								
+								if ( .delay_timer && .@time < instance_ice_palace ) {
+									.@fail_type |= 1;
+									.@cooldown = ( instance_ice_palace - .@time );
+								}
+								
+								if ( Zeny < .zeny_cost ) .@fail_type |= 2;
+								
+								if ( BaseLevel < .base_level[0] || BaseLevel >= .base_level[1] ) {
+									.@fail_type |= 4;
+								}
+								
+								for ( .@i = 0; .@i < .required_item_size && .@required_item$ == ""; .@i += 2 )
+									if ( countitem( .required_item[.@i] ) < .required_item[.@i+1] ) {
+										.@fail_type |= 8;
+										.@required_item$ = "You require "+.required_item[.@i+1]+"x "+getitemname( .required_item[.@i] );
+									}
+									
+								if ( .@fail_type ) {
+									.@name$ = strcharinfo(0);
+									break;
+								}
+							}
+				attachrid( .@origin );
+				
+				if( .@name$ != "" ){
+					next;
+					mes "^0055FF[ "+.instance_name$+" ]^000000";
+					mes "^0055FF"+.@name$+"^000000";
+					if ( .@fail_type & 1 ) mes "You need to wait for "+epoch_time( .@cooldown );
+					if ( .@fail_type & 2 ) mes "You do not have enough zeny.";
+					if ( .@fail_type & 4 ) mes "You are too weak to enter this instance.";
+					if ( .@fail_type & 8 ) mes .@required_item$;
+				}
+				else if( .@member_count < .@guild_member[0] || .@member_count > .@guild_member[1] ) {
+					mes "You need to form a guild with "+.@guild_member[0]+" ~ "+.@guild_member[1]+" member(s).";
+				}
+				else {
+					.@instance = instance_create( .instance_name$,IM_GUILD,.@guild_id );
+					if( .@instance < 0 ) {
+						npctalk "Memorial Dungeon reservation failed.";
+						mes "^0000FF"+.instance_name$+" ^000000- Reservation Failed!";
+						close;
+					}
+					npctalk "Memorial Dungeon has been generated for guild - "+getguildname( .@guild_id );
+					
+					getguildmember .@guild_id,2;
+					for( .@i = 0; .@i < $@guildmembercount; .@i++ )
+						if( attachrid( $@guildmemberaid[.@i] ) )
+							if ( strcharinfo(3) == .@current_map$ ) {
+								Zeny -= .zeny_cost;
+
+								for ( .@i = 0; .@i < .required_item_size; .@i += 2 )
+									delitem .required_item[.@i],.required_item[.@i+1];
+								
+								callsub( L_enter,.instance_name$ );
+							}
+				}
+				break;
+			case 2:
+				if( instance_mapname( .map$[0] ) == "" ){
+					npctalk "Memorial Dungeon doesnt exist for guild - "+getguildname( .@guild_id );
+				}
+				else {
+					getguildmember .@guild_id,1;
+					getguildmember .@guild_id,2;
+					for( .@i = 0; .@i < $@guildmembercount; .@i++ )
+						if ( isloggedin( $@guildmemberaid[.@i],$@guildmembercid[.@i] ) ) 
+							if( attachrid( $@guildmemberaid[.@i] ) ) {
+								callsub( L_enter,.instance_name$ );
+							}
+					detachrid;
+				}
+				break;
+			case 3:
+				mes "Memorial Dungeon Destroyed.";
+				instance_destroy instance_id();
+				break;
+			default: 
+				// mes "This is a Memorial Dungeon.";
+				break;
+		}
+		close;
+	
+	L_enter:
+		.@ins = instance_enter( getarg(0) );
+		switch ( .@ins ) {
+			case 0: 
+				instance_ice_palace = gettimetick(2) + .delay_timer;
+				break;
+			case 1:
+				mes "You can enter the dungeon after making the party.";
+				close;
+			case 2:
+				mes "The guild instance "+getarg(0)+" does not exist.";
+				mes "The guild leader did not generate the dungeon yet.";
+				close;
+			case 3:
+				mes "An unknown error has occurred.";
+				close;
+		}
+		return;
+	
+	OnInit:
+		// delay in second
+		// .delay_timer = ( 3600 * 24 );
+		
+		// .zeny cost
+		// .zeny_cost = 1000000;
+		
+		// min. and max level
+		setarray .base_level,90,175;
+		
+		// required items
+		setarray .required_item,
+			// Frozen_Rose,3,
+			// Ice_Piece,10,
+			// Crystal_Mirror,1;
+			512,100;
+		.required_item_size = getarraysize( .required_item ) - 1;
+			
+		// name of Instance
+		.instance_name$ = "Ice Palace";
+		
+		// instance timeout limit
+		setarray .time_limit,( 3600 * 11 ),5;
+		
+		// instance map lists
+		setarray .map$,"1@ice";
+
+		.map_size = getarraysize( .map$ );
+		end;
+}
+
+
+
+1@ice,0,0,0	script	md_ice_palace_main	-1,{
+	end;
+	
+	OnInstanceInit:
+		sleep 1000;
+		.@map$ = strnpcinfo(4);
+		setmapflag .@map$,mf_nomvploot;
+		setmapflag .@map$,mf_nomobloot;
+		
+		hideonnpc instance_npcname( "Piano#md_ice" );
+		hideonnpc instance_npcname( "Magical Fountain#md_ice" );
+		hideonnpc instance_npcname( "Treasure Chest#md_ice" );
+
+		'part = 0;
+		end;
+		
+	OnTalk:
+		.@guild_id = getcharid(2);
+		.@is_leader = ( getcharid(0) == getguildmasterid(.@guild_id) );
+		
+		if ( !.@is_leader ) {
+			mes "^FF0000[ ???????? ]^000000";
+			mes "You are not the leader...";
+		}
+		else {
+			setarray .@frozen_statue$,"Frozen Statue",instance_npcname( "Frozen Statue#main_npc" );
+			setarray .@frozen_piano$,"Frozen Piano",instance_npcname( "Piano#md_ice" );
+			setarray .@frozen_fountain$,"Magical Fountain",instance_npcname( "Magical Fountain#md_ice" );
+		
+			switch ( 'part ) {
+				default:
+					end;
+				case 0:
+					mes "^FF0000[ "+.@frozen_statue$[0]+" ]^000000";
+					mes "This Ice Palace are guarded by alot of strong guardians.";
+					npctalk "This Ice Palace are guarded by alot of strong guardians.",.@frozen_statue$[1];
+					next;
+					mes "^FF0000[ "+.@frozen_statue$[0]+" ]^000000";
+					mes "Due to some unknown reason, some of the guardian has lost control and went berserk!";
+					npctalk "Due to some unknown reason, some of the guardian has lost control and went berserk!",.@frozen_statue$[1];
+					next;
+					mes "^FF0000[ "+.@frozen_statue$[0]+" ]^000000";
+					mes "This could endanger the Ice Queen.";
+					npctalk "This could endanger the Ice Queen.",.@frozen_statue$[1];
+					next;
+					mes "^FF0000[ "+.@frozen_statue$[0]+" ]^000000";
+					mes "Please lend me your strength, help me defeat these berserk guardians.";
+					npctalk "Please lend me your strength, help me defeat these berserk guardians.",.@frozen_statue$[1];
+					next;
+					mes "^FF0000[ "+.@frozen_statue$[0]+" ]^000000";
+					mes "So... brave warriors, please move forward into the dungeons.";
+					npctalk "So... brave warriors, please move forward into the dungeons.",.@frozen_statue$[1];
+					'part = 1;
+					hideonnpc .@frozen_statue$[1];
+					movenpc .@frozen_statue$[1],188,125;
+					break;
+				case 2:
+					mes "^FF0000[ "+.@frozen_statue$[0]+" ]^000000";
+					mes "It's not the time to celebrate now!";
+					npctalk "It's not the time to celebrate now!",.@frozen_statue$[1];
+					next;
+					mes "^FF0000[ "+.@frozen_statue$[0]+" ]^000000";
+					mes "You defeated the Guardians who guard the front entrance, more guardians will show up later on.";
+					npctalk "You defeated the Guardians who guard the front entrance, more guardians will show up later on.",.@frozen_statue$[1];
+					hideonnpc .@frozen_statue$[1];
+					.@event_label$ = "OnStart2";
+					break;
+				case 3:
+					mes "^FF0000[ "+.@frozen_piano$[0]+" ]^000000";
+					if ( select( "Press on Piano Key" ) == 1 ) {
+						mes "Suddenly the Piano play on it own.";
+						mes " ";
+						soundeffectall "chaos_of_eternity.wav",0,strcharinfo(3);
+						sleep2 3000;
+						mes "The Ice Piano has sung it's first note!";
+						hideonnpc .@frozen_piano$[1];
+						movenpc .@frozen_piano$[1],89,201;
+						.@event_label$ = "OnStart3";
+					}
+					break;
+				case 4:
+					mes "^FF0000[ "+.@frozen_piano$[0]+" ]^000000";
+					if ( select( "Press on Piano Key" ) == 1 ) {
+						mes "Suddenly the Piano play on it own.";
+						mes " ";
+						soundeffectall "chaos_of_eternity.wav",0,strcharinfo(3);
+						sleep2 3000;
+						mes "The Ice Piano has sung it's second note!";
+						hideonnpc .@frozen_piano$[1];
+						// movenpc .@frozen_piano$[1],188,125;
+						.@event_label$ = "OnStart4";
+					}
+					break;
+				case 5:
+					mes "^FF0000[ "+.@frozen_fountain$[0]+" ]^000000";
+					mes "Incredible, the magical fountain aren't affected by the cold and freezing environment.";
+					next;
+					mes "^FF0000[ "+.@frozen_fountain$[0]+" ]^000000";
+					mes "Ktullanux approaching here to protect the Fountain.";
+					soundeffectall "se_water_fall01.wav",0,strcharinfo(3);
+					hideonnpc .@frozen_fountain$[1];
+					.@event_label$ = "OnStart5";
+					break;
+				case 6:
+					mes "^FF0000[ Treasure Chest ]^000000";
+					mes "You manage to defeat the Guardian of the Ice Palace.";
+					mes " ";
+					mes "These rewards are belongs to you now.";
+					'part = 7;
+					
+					// rewards
+					getitem 512,1;
+					getitem 512,2;
+					getitem 512,3;
+					
+					donpcevent .@npc_name$+"::OnInstanceStop";
+					break;
+				case 7:
+					mes "*It's time to leave this place before too late.*";
+					break;
+			}
+		}
+		close2;
+		if ( .@event_label$ != "" ) {
+			donpcevent strnpcinfo(3) +"::"+.@event_label$;
+		}
+		end;
+		
+	OnInstanceStop:
+		sleep 10000;
+		.@map$ = strnpcinfo(4);
+		for ( .@i = 60; .@i >= 0; .@i -= 10 ) {
+			mapannounce .@map$,"<Ice Palace> The Palace is crumbling down. Time to leave!",bc_map;
+			sleep 10000;
+		}
+		instance_destroy;
+		end;
+		
+	OnStart1:
+		'part = 2;
+		
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		
+		mapannounce .@map$,"<Ice Palace> The Guardians of the Ice Palace has appeared!",bc_map;
+		monster .@map$,184,95,"--ja--",1777,1,.@npc_name$+"::OnKilled1";
+		monster .@map$,191,95,"--ja--",1777,1,.@npc_name$+"::OnKilled1";
+		monster .@map$,184,102,"--ja--",1777,1,.@npc_name$+"::OnKilled1";
+		monster .@map$,187,102,"--ja--",1777,1,.@npc_name$+"::OnKilled1";
+		monster .@map$,191,102,"--ja--",1777,1,.@npc_name$+"::OnKilled1";
+		end;
+		
+	OnKilled1:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		
+		if ( !mobcount( .@map$,.@npc_name$+"::OnKilled1" ) ) {
+			hideoffnpc instance_npcname( "Frozen Statue#main_npc" );
+		}
+		end;
+		
+		
+	OnStart2:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		.@user = getmapusers( .@map$ );
+		
+		mapannounce .@map$,"<Ice Palace> The Guardians of the Ice Palace has appeared!",bc_map;
+		
+		areamonster .@map$,172,132,203,132,"--ja--",1777,( .@user * 2 ),.@npc_name$+"::OnKilled2";
+		areamonster .@map$,172,119,203,119,"--ja--",1777,( .@user * 2 ),.@npc_name$+"::OnKilled2";
+		areamonster .@map$,172,126,203,126,"--ja--",1777,( .@user * 2 ),.@npc_name$+"::OnKilled2";
+		areamonster .@map$,172,132,203,132,"--ja--",1778,( .@user * 1 ),.@npc_name$+"::OnKilled2";
+		areamonster .@map$,172,119,203,119,"--ja--",1778,( .@user * 1 ),.@npc_name$+"::OnKilled2";
+		areamonster .@map$,172,126,203,126,"--ja--",1778,( .@user * 1 ),.@npc_name$+"::OnKilled2";
+		end;
+		
+	OnKilled2:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		
+		if ( !mobcount( .@map$,.@npc_name$+"::OnKilled2" ) ) {
+			'part = 3;
+			hideoffnpc instance_npcname( "Piano#md_ice" );
+			mapannounce .@map$,"<Ice Palace> Search for the Piano!",bc_map;
+		}
+		end;
+		
+	OnStart3:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		.@user = getmapusers( .@map$ );
+		
+		mapannounce .@map$,"<Ice Palace> The Guardian of the Ice Palace has appeared!",bc_map;
+		monster .@map$,187,125,"--ja--",1252,1,.@npc_name$+"::OnKilled3";
+		
+		areamonster .@map$,172,132,203,132,"--ja--",1777,( .@user * 2 ),.@npc_name$+"::OnKilled3";
+		areamonster .@map$,172,119,203,119,"--ja--",1777,( .@user * 2 ),.@npc_name$+"::OnKilled3";
+		areamonster .@map$,172,126,203,126,"--ja--",1777,( .@user * 2 ),.@npc_name$+"::OnKilled3";
+		areamonster .@map$,172,132,203,132,"--ja--",1778,( .@user * 1 ),.@npc_name$+"::OnKilled3";
+		areamonster .@map$,172,119,203,119,"--ja--",1778,( .@user * 1 ),.@npc_name$+"::OnKilled3";
+		areamonster .@map$,172,126,203,126,"--ja--",1778,( .@user * 1 ),.@npc_name$+"::OnKilled3";
+		end;
+		
+	OnKilled3:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		
+		if ( !mobcount( .@map$,.@npc_name$+"::OnKilled3" ) ) {
+			'part = 4;
+			hideoffnpc instance_npcname( "Piano#md_ice" );
+			mapannounce .@map$,"<Ice Palace> Search for the Piano!",bc_map;
+		}
+		end;
+		
+	OnStart4:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		.@user = getmapusers( .@map$ );
+		
+		mapannounce .@map$,"<Ice Palace> The Guardian of the Ice Palace has appeared!",bc_map;
+		monster .@map$,187,125,"--ja--",1251,1,.@npc_name$+"::OnKilled4";
+		
+		areamonster .@map$,172,132,203,132,"--ja--",1777,( .@user * 2 ),.@npc_name$+"::OnKilled4";
+		areamonster .@map$,172,119,203,119,"--ja--",1777,( .@user * 2 ),.@npc_name$+"::OnKilled4";
+		areamonster .@map$,172,126,203,126,"--ja--",1777,( .@user * 2 ),.@npc_name$+"::OnKilled4";
+		areamonster .@map$,172,132,203,132,"--ja--",1778,( .@user * 1 ),.@npc_name$+"::OnKilled4";
+		areamonster .@map$,172,119,203,119,"--ja--",1778,( .@user * 1 ),.@npc_name$+"::OnKilled4";
+		areamonster .@map$,172,126,203,126,"--ja--",1778,( .@user * 1 ),.@npc_name$+"::OnKilled4";
+		end;
+		
+	OnKilled4:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		
+		if ( !mobcount( .@map$,.@npc_name$+"::OnKilled4" ) ) {
+			'part = 5;
+			hideoffnpc instance_npcname( "Magical Fountain#md_ice" );
+			mapannounce .@map$,"<Ice Palace> Search for the Magical Fountain!",bc_map;
+		}
+		end;
+		
+	OnStart5:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		.@user = getmapusers( .@map$ );
+		stopnpctimer;
+		
+		monster .@map$,187,125,"--ja--",1779,1,.@npc_name$+"::OnStartForm1";
+		
+		areamonster .@map$,172,132,203,132,"--ja--",1777,( .@user * 2 );
+		areamonster .@map$,172,119,203,119,"--ja--",1777,( .@user * 2 );
+		areamonster .@map$,172,126,203,126,"--ja--",1777,( .@user * 2 );
+		areamonster .@map$,172,132,203,132,"--ja--",1778,( .@user * 1 );
+		areamonster .@map$,172,119,203,119,"--ja--",1778,( .@user * 1 );
+		areamonster .@map$,172,126,203,126,"--ja--",1778,( .@user * 1 );
+		end;
+		
+	OnStartForm1:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		stopnpctimer;
+		
+		monster .@map$,187,125,"--ja--",1252,1,.@npc_name$+"::OnStartFormEnd1";
+		monster .@map$,187,125,"--ja--",1251,1,.@npc_name$+"::OnStartFormEnd1";
+		'ktullanux_form = 1;
+		'ktullanux_form_timer = 30;
+		initnpctimer;
+		end;
+		
+	OnStartFormEnd1:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		if ( mobcount( .@map$,.@npc_name$+"::OnStartFormEnd1" ) )
+			end;
+		
+	OnStartForm2:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		stopnpctimer;
+		
+		mapannounce .@map$,"<Ice Palace> Ktullanux turned into its Second Form !!",bc_map;
+		'ktullanux_form = 2;
+		'ktullanux_form_timer = 30;
+		monster .@map$,187,125,"--ja--",1779,1,.@npc_name$+"::OnStartForm3";
+		initnpctimer;
+		end;
+		
+	OnStartForm3:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		
+		mapannounce .@map$,"<Ice Palace> Ktullanux turned into its Final Form and splitts into 3 !!",bc_map;
+		'ktullanux_form = 3;
+		'ktullanux_form_timer = 60;
+		monster .@map$,187,125,"--ja--",1779,1,.@npc_name$+"::OnKilled5",Size_Small;
+		monster .@map$,180,119,"--ja--",1779,1,.@npc_name$+"::OnKilled5",Size_Small;
+		monster .@map$,195,119,"--ja--",1779,1,.@npc_name$+"::OnKilled5",Size_Small;
+		initnpctimer;
+		end;
+	
+	OnTimer5000:
+		'ktullanux_form_timer -= 5;
+		if ( 'ktullanux_form_timer <= 0 ) {
+			.@map$ = strnpcinfo(4);
+			.@npc_name$ = strnpcinfo(3);
+
+			switch ( 'ktullanux_form ) {
+				case 1:
+					if ( mobcount( .@map$,.@npc_name$+"::OnStartFormEnd1" ) ) {
+						killmonster .@map$,.@npc_name$+"::OnStartFormEnd1";
+						donpcevent .@npc_name$+"::OnStart5";
+						mapannounce .@map$,"<Ice Palace> Ktullanux revived using the life force of the remaining guardians!!",bc_map;
+					}
+					else {
+						donpcevent .@npc_name$+"::OnStartForm2";
+					}
+					break;
+				case 2:
+					.@user = getmapusers( .@map$ );
+					areamonster .@map$,172,132,203,132,"--ja--",1777,( .@user * 2 );
+					areamonster .@map$,172,119,203,119,"--ja--",1777,( .@user * 2 );
+					areamonster .@map$,172,126,203,126,"--ja--",1777,( .@user * 2 );
+					areamonster .@map$,172,132,203,132,"--ja--",1778,( .@user * 1 );
+					areamonster .@map$,172,119,203,119,"--ja--",1778,( .@user * 1 );
+					areamonster .@map$,172,126,203,126,"--ja--",1778,( .@user * 1 );
+					'ktullanux_form_timer = 30;
+					initnpctimer;
+					mapannounce .@map$,"<Ice Palace> Ktullanux summoned another batch of Guardians!!",bc_map;
+					break;
+				case 3:
+					if ( mobcount( .@map$,.@npc_name$+"::OnKilled5" ) >= 3 ) {
+						killmonster .@map$,.@npc_name$+"::OnKilled5";
+						donpcevent .@npc_name$+"::OnStartForm3";
+					}
+					break;
+			}
+		}
+		else initnpctimer;
+		end;
+	
+	OnKilled5:
+		.@map$ = strnpcinfo(4);
+		.@npc_name$ = strnpcinfo(3);
+		
+		if ( !mobcount( .@map$,.@npc_name$+"::OnKilled5" ) ) {
+			'part = 6;
+			mapannounce .@map$,"<Ice Palace> Ktullanux of the Ice Palace has been defeated!",bc_map;
+			sleep2 5000;
+			hideoffnpc instance_npcname( "Treasure Chest#md_ice" );
+			sleep2 5000;
+			mapannounce .@map$,"<Ice Palace> The Ice Queen has provided bountiful rewards for the Guild Leader!!",bc_map;
+		}
+		end;
+}
+
+1@ice,187,86,4	script	Frozen Statue#main_npc	4_M_FROZEN,{
+	doevent instance_npcname( "md_ice_palace_main" )+"::OnTalk";
+}
+
+1@ice,188,98,4	script	ice_palace_npc3	HIDDEN_WARP_NPC,4,1,{
+	end;
+	
+	OnTouch:
+		if ( 'part == 1 ) {
+			donpcevent instance_npcname( "md_ice_palace_main" )+"::OnStart1";
+			specialeffect EF_BASH;
+			disablenpc strnpcinfo(3);
+		}
+		end;
+}
+
+1@ice,210,125,4	script	Piano#md_ice	4_ENERGY_WHITE,{
+	doevent instance_npcname( "md_ice_palace_main" )+"::OnTalk";
+}
+
+1@ice,101,159,4	script	Magical Fountain#md_ice	4_ENERGY_BLUE,{
+	doevent instance_npcname( "md_ice_palace_main" )+"::OnTalk";
+}
+
+1@ice,187,125,4	script	Treasure Chest#md_ice	4_TREASURE_BOX,{
+	doevent instance_npcname( "md_ice_palace_main" )+"::OnTalk";
+}

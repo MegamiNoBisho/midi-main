@@ -388,6 +388,8 @@ static struct item_data *itemdb_create_item(unsigned short nameid) {
 	memset(id, 0, sizeof(struct item_data));
 	id->nameid = nameid;
 	id->type = IT_ETC; //Etc item
+	id->add_stock_for.nameid = NULL;
+	id->add_stock_for.count = 0;
 	uidb_put(itemdb, nameid, id);
 	return id;
 }
@@ -892,15 +894,27 @@ static bool itemdb_read_flag(char* fields[], int columns, int current) {
  * Sets item that enable for npc_stock
  **/
 static bool itemdb_read_npc_stock(char* fields[], int columns, int current) {
-	unsigned short nameid = atoi(fields[0]);
+	unsigned short nameid = atoi(fields[0]), i;
 	struct item_data *id;
 
 	if (!(id = itemdb_exists(nameid))) {
-		ShowError("itemdb_read_npc_stock: Invalid item item with id %hu\n", nameid);
+		ShowError("itemdb_read_npc_stock: Invalid item with id %s\n", fields[0]);
 		return false;
 	}
 
 	id->flag.global_stock = 1;
+
+	for (i = 1; i < columns; i++) {
+		unsigned short nameid2 = atoi(fields[i]);
+		if (!(id = itemdb_exists(nameid2))) {
+			ShowError("itemdb_read_npc_stock: Invalid item with id %s as 'ItemToIncreaseTheStock' for '%s'\n", fields[i], fields[0]);
+		}
+		else {
+			RECREATE(id->add_stock_for.nameid, unsigned short, id->add_stock_for.count+1);
+			id->add_stock_for.nameid[id->add_stock_for.count++] = nameid;
+		}
+	}
+
 	return true;
 }
 
@@ -1239,6 +1253,12 @@ static bool itemdb_parse_dbrow(char** str, const char* source, int line, int scr
 	//ID,Name,Jname,Type,Price,Sell,Weight,ATK,DEF,Range,Slot,Job,Job Upper,Gender,Loc,wLV,eLV,refineable,View
 	if (!(id = itemdb_exists(nameid)))
 		id = itemdb_create_item(nameid);
+	else {
+		if (id->add_stock_for.nameid)
+			aFree(id->add_stock_for.nameid);
+		id->add_stock_for.nameid = NULL;
+		id->add_stock_for.count = 0;
+	}
 
 	safestrncpy(id->name, str[1], sizeof(id->name));
 	safestrncpy(id->jname, str[2], sizeof(id->jname));
@@ -1716,7 +1736,7 @@ static void itemdb_read(void) {
 		sv_readdb(dbsubpath2, "item_delay.txt",         ',', 2, 3, -1, &itemdb_read_itemdelay, i);
 		sv_readdb(dbsubpath2, "item_buyingstore.txt",   ',', 1, 1, -1, &itemdb_read_buyingstore, i);
 		sv_readdb(dbsubpath2, "item_flag.txt",          ',', 2, 2, -1, &itemdb_read_flag, i);
-		sv_readdb(dbsubpath1, "item_npc_stock.txt",     ',', 1, 1, -1, &itemdb_read_npc_stock, i);
+		sv_readdb(dbsubpath1, "item_npc_stock.txt",     ',', 2, 6, -1, &itemdb_read_npc_stock, i);
 		aFree(dbsubpath1);
 		aFree(dbsubpath2);
 	}
@@ -1751,6 +1771,10 @@ static void destroy_item_data(struct item_data* self) {
 		}
 		aFree(self->combos);
 	}
+	if (self->add_stock_for.nameid)
+		aFree(self->add_stock_for.nameid);
+	self->add_stock_for.nameid = NULL;
+	self->add_stock_for.count = 0;
 #if defined(DEBUG)
 	// trash item
 	memset(self, 0xDD, sizeof(struct item_data));

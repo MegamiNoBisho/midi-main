@@ -14,3 +14,14 @@
 // SpriteID is a job class value.
 // Weapon and Shield uses Item ID, while Head uses View ID.
 
+//ktulannux minis
+3500,1779,0
+3501,1779,0
+3501,1779,0
+
+//nightmare mobs - pyramids
+3336,1029,0
+3338,1038,0
+3337,1191,0
+3334,1041,0
+3335,1146,0

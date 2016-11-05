@@ -83,6 +83,7 @@ struct npc_data {
 			unsigned short itemshop_nameid; // Item Shop cost item ID
 			char pointshop_str[32]; // Point Shop cost variable name
 			bool discount;
+			bool ignoreStock; // 0:Enable global stock
 		} shop;
 		struct {
 			short xs,ys; // OnTouch area radius
@@ -213,6 +214,7 @@ void npc_market_delfromsql_(const char *exname, unsigned short nameid, bool clea
 unsigned int npc_stock_check(unsigned short nameid);
 void npc_stock_loadsql(void);
 unsigned int npc_stock_update(unsigned short nameid, int amount, struct npc_data *nd, struct map_session_data *sd);
+unsigned int npc_stock_update_all(struct item_data *id, int amount, struct npc_data *nd, struct map_session_data *sd);
 
 #ifdef SECURE_NPCTIMEOUT
 	int npc_rr_secure_timeout_timer(int tid, unsigned int tick, int id, intptr_t data);

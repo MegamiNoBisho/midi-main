@@ -2004,12 +2004,8 @@ uint8 npc_selllist(struct map_session_data* sd, int n, unsigned short *item_list
 			}
 		}
 
-		if (!nd->u.shop.ignoreStock && sd->inventory_data[idx]->flag.global_stock) {
-			unsigned int stock = npc_stock_update(sd->status.inventory[idx].nameid, amount, nd, sd);
-			char msg[CHAT_SIZE_MAX];
-			sprintf(msg, "Stock of item '%s' is increased to '%d'.", itemdb_jname(sd->status.inventory[idx].nameid), stock);
-			clif_colormes(sd->fd, color_table[COLOR_CYAN], msg);
-			clif_disp_overhead(&nd->bl, msg);
+		if (!nd->u.shop.ignoreStock && sd->inventory_data[idx]->add_stock_for.nameid && sd->inventory_data[idx]->add_stock_for.count) {
+			npc_stock_update_all(sd->inventory_data[idx], amount, nd, sd);
 		}
 
 		pc_delitem(sd, idx, amount, 0, 6, LOG_TYPE_NPC);
@@ -4726,6 +4722,34 @@ unsigned int npc_stock_update(unsigned short nameid, int amount, struct npc_data
 
 	ShowInfo("NPC Stock: Item "CL_WHITE"%s"CL_RESET" (%d) updated from '%d' to "CL_WHITE"%d"CL_RESET".\n", itemdb_name(nameid), nameid, prev_amount, p->amount);
 	return p->amount;
+}
+
+/**
+ * Check when item is sold, it must increase stock to other item or not
+ * @param id Item Data of sold item
+ * @param amount Amount sold
+ * @param nd
+ * @param sd
+ **/
+unsigned int npc_stock_update_all(struct item_data *id, int amount, struct npc_data *nd, struct map_session_data *sd) {
+	int i;
+
+	nullpo_ret(id);
+
+	if (!id->add_stock_for.nameid)
+		return 0;
+
+	for (i = 0; i < id->add_stock_for.count; i++) {
+		if (id->add_stock_for.nameid[i]) {
+			unsigned int stock = npc_stock_update(id->add_stock_for.nameid[i], amount, nd, sd);
+			char msg[CHAT_SIZE_MAX];
+			sprintf(msg, "Stock of '%s' is increased to '%d' by selling '%s'.", itemdb_jname(id->add_stock_for.nameid[i]), stock, id->jname);
+			if (sd)
+				clif_colormes(sd->fd, color_table[COLOR_CYAN], msg);
+			if (nd)
+				clif_disp_overhead(&nd->bl, msg);
+		}
+	}
 }
 
 /*==========================================
