@@ -1,4 +1,19 @@
 // List of Item for NPC Stock
+//
+// Structure:
+// StockItem,ItemToIncreaseTheStock
+//
+// StockItem: This item will use global stock when player buys it from NPC
+//            If the stock is 0, player cannot buy anymore.
+// ItemToIncreaseTheStock: If this item is sold to any NPC, it will increases
+//            the stock of StockItem.
+//            Use another comma to add item.
 //=========================================
-//504
-//505
+//// White Potion, stock added by White Herb
+//504,509
+//// Blue Potion, stock added by Blue Herb
+//505,510
+//// Green Potion, stock added by Green Herb
+//506,511
+//// Meat, stock added by Apple, Banana, Carrot
+//517,512,513,515
