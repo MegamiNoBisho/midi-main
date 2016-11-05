@@ -637,8 +637,8 @@ function	script	F_KafSet	{
 		setarray @wrpD$[0], "Geffen", "Payon", "Morroc", "Al De Baran";
 		setarray @wrpP[0], 1200, 1200, 1200, 1800;
 	} else if (strnpcinfo(4) == "morocc") {
-		setarray @wrpD$[0], "Prontera", "Payon", "Alberta";
-		setarray @wrpP[0], 1200, 1200, 1800;
+		setarray @wrpD$[0], "Prontera", "Payon", "Alberta", "Comodo Pharos Beacon";
+		setarray @wrpP[0], 1200, 1200, 1800, 1800;
 		setarray @viewpX[0], 156, 163, 28, 292;
 		setarray @viewpY[0], 97, 260, 167, 211;
 	} else if (strnpcinfo(4) == "umbala") {
