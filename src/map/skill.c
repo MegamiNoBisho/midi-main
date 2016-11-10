@@ -1107,71 +1107,21 @@ int skill_additional_effect(struct block_list* src, struct block_list *bl, uint1
 						status_change_start(src,bl,SC_POISON,sce->val2, sce->val1,src->id,0,0,
 							skill_get_time2(AS_ENCHANTPOISON,sce->val1),SCSTART_NONE);
 						// Enchant Poison Lifesteal by Hanashi
-						case AS_ENCHANTPOISON:
+										case AS_ENCHANTPOISON:
 							{
-							if(pc_checkskill(sd,AS_ENCHANTPOISON)==1){
-							int heal;
-							heal = (sstatus->max_hp * 1/100);
-							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
-							status_heal(src, heal, 0, 0);
-								}
-							if(pc_checkskill(sd,AS_ENCHANTPOISON)==2){
-							int heal;
-							heal = (sstatus->max_hp * 2/100);
-							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
-							status_heal(src, heal, 0, 0);
-								}
-							if(pc_checkskill(sd,AS_ENCHANTPOISON)==3){
-							int heal;
-							heal = (sstatus->max_hp * 3/100);
-							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
-							status_heal(src, heal, 0, 0);
-								}
-							if(pc_checkskill(sd,AS_ENCHANTPOISON)==4){
-							int heal;
-							heal = (sstatus->max_hp * 4/100);
-							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
-							status_heal(src, heal, 0, 0);
-								}
-							if(pc_checkskill(sd,AS_ENCHANTPOISON)==5){
-							int heal;
-							heal = (sstatus->max_hp * 5/100);
-							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
-							status_heal(src, heal, 0, 0);
-								}
-							if(pc_checkskill(sd,AS_ENCHANTPOISON)==6){
-							int heal;
-							heal = (sstatus->max_hp * 6/100);
-							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
-							status_heal(src, heal, 0, 0);
-								}
-							if(pc_checkskill(sd,AS_ENCHANTPOISON)==7){
-							int heal;
-							heal = (sstatus->max_hp * 7/100);
-							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
-							status_heal(src, heal, 0, 0);
-								}
-							if(pc_checkskill(sd,AS_ENCHANTPOISON)==8){
-							int heal;
-							heal = (sstatus->max_hp * 8/100);
-							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
-							status_heal(src, heal, 0, 0);
-								}
-							if(pc_checkskill(sd,AS_ENCHANTPOISON)==9){
-							int heal;
-							heal = (sstatus->max_hp * 9/100);
-							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
-							status_heal(src, heal, 0, 0);
-								}
-							if(pc_checkskill(sd,AS_ENCHANTPOISON)>9){ // Lifesteal will only work if EP is Level 10 [Scylla]
-							int heal;
-							heal = (sstatus->max_hp * 1/10); // Removed skill_lv to fix 0 value lifesteal
-							clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
-							status_heal(src, heal, 0, 0);
-								}
-							}
+							int i;
+							for(i=0;i<=10;i++){
+								if(pc_checkskill(sd,AS_ENCHANTPOISON)==i){
+								int heal;
+									if(i<10)
+									heal = (sstatus->max_hp * i/100);
+									else heal = (sstatus->max_hp * 1/10);	
+										clif_skill_nodamage(NULL, src, AL_HEAL, heal, 1);
+										status_heal(src, heal, 0, 0);
+										}
+										}
 							break;
-													}
+							}
 					// Enchant Deadly Poison gives a chance to deadly poison attacked enemies
 					if((sce=sc->data[SC_EDP]))
 						sc_start4(src,bl,SC_DPOISON,sce->val2, sce->val1,src->id,0,0,
