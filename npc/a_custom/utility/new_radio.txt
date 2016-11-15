@@ -1,4 +1,14 @@
--	script	Radio DJ#vip		-1,{
+// -------------------------------------------------------
+//     Radio - MIDI City Ragnarok Online
+// -------------------------------------------------------
+// Radio NPC duh
+// -------------------------------------------------------
+// Author: Cyan Hijirikawa
+// -------------------------------------------------------
+// Version
+// 1.0 - Initial Release
+// -------------------------------------------------------
+-	script	Radio DJ		-1,{
 OnRadio:
 	deletearray @title$;
 	deletearray @number;
@@ -79,7 +89,7 @@ OnRadio:
 					announce strcharinfo(0)+" has chosen to play [ "+@title$[.@bgm]+" ] for everyone!",1;
 					sleep2 2000;
 					playBGMall @number$[.@bgm];
-					set .delay, gettimetick(2) + 300;
+					set .delay, gettimetick(2) + 180;
 					end;
 			}			
 		case 2:

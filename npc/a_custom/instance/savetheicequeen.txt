@@ -175,7 +175,9 @@ payon_mem,113,98,4	script	Frozen Statue::instance_ice_palace	10191,{
 			// Frozen_Rose,3,
 			// Ice_Piece,10,
 			// Crystal_Mirror,1;
-			512,100;
+			7066,10,
+			749,3,
+			747,1;
 		.required_item_size = getarraysize( .required_item ) - 1;
 			
 		// name of Instance
